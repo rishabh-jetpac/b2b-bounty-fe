@@ -1,7 +1,7 @@
 # Codex React Project Guidelines
 
 ## Purpose
-Use this repository as the baseline for building a **client-side React SPA**. Default to **Vite + React + TypeScript** and treat this file as the source of truth for project structure, library choices, and verification. Do not introduce SSR, backend services, or API server code unless the user explicitly asks.
+Use this repository as the baseline for building a **client-side React SPA**. Default to **Vite + React + TypeScript** and treat this file as the source of truth for project structure, library choices, and verification. Do not introduce SSR, backend services, or API server code unless the user explicitly asks. Assume incoming UI references are **mobile designs first**, and implement the mobile layout before adapting it for larger screens.
 
 ## Default Stack
 Codex should scaffold and extend projects with these defaults:
@@ -36,6 +36,13 @@ Start with a working shell:
 - A base route renders successfully before feature work begins.
 - Shared theme tokens live in one place and are reused.
 
+## Mobile-First Design Rules
+- Treat pasted or referenced designs as the mobile source of truth unless the user says otherwise.
+- Build styles from the smallest viewport up, then add larger-screen adjustments with progressive breakpoints.
+- Prioritize touch-friendly spacing, tap targets, safe-area handling, and vertically stacked flows by default.
+- Keep page shells, navigation, and CTAs usable on narrow screens before adding tablet or desktop enhancements.
+- When layout decisions are ambiguous, preserve the mobile composition rather than inventing desktop-only structure.
+
 ## Implementation Rules
 - Use TypeScript and functional components only.
 - Name components with `PascalCase`; hooks, helpers, and variables use `camelCase`.
@@ -44,6 +51,7 @@ Start with a working shell:
 - Use Zustand only for client-only shared state that does not belong in route params or React Query.
 - Prefer MUI components before writing custom primitives.
 - Keep styling centralized and token-driven; do not scatter hard-coded values when a theme token is appropriate.
+- Prefer responsive units and mobile-safe layout constraints over fixed desktop widths.
 - Do not add test frameworks or test files by default. This repo does not require automated tests now or later unless the user explicitly requests them.
 
 ## Required Commands
@@ -59,4 +67,4 @@ A scaffold or feature is not complete until:
 - routing and providers are wired correctly,
 - `npm run lint` passes,
 - `npm run build` passes,
-- the changed UI has been manually checked for obvious desktop and mobile issues.
+- the changed UI has been manually checked on a mobile viewport first, then reviewed for obvious larger-screen issues.
