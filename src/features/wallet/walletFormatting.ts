@@ -1,6 +1,12 @@
-import type { WalletTransactionType } from './types'
+const walletUpdatedAtFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: '2-digit',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+})
 
-const walletDateFormatter = new Intl.DateTimeFormat('en-US', {
+const walletTransactionDateFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: '2-digit',
   year: 'numeric',
@@ -15,17 +21,24 @@ export function formatWalletCurrency(amount: number, currency = 'USD') {
   }).format(amount)
 }
 
-export function formatWalletAmount(
-  amount: number,
-  type: WalletTransactionType,
-  currency = 'USD',
-) {
-  const symbol = type === 'credit' ? '+' : '-'
-  return `${symbol}${formatWalletCurrency(amount, currency)}`
+export function formatWalletUpdatedAt(value: string) {
+  return walletUpdatedAtFormatter.format(new Date(value))
 }
 
-export function formatWalletDate(date: string) {
-  const [year, month, day] = date.split('-').map(Number)
+export function formatWalletTransactionAmount(
+  amount: number,
+  type: 'debit' | 'credit',
+  currency = 'USD',
+) {
+  const sign = type === 'credit' ? '+' : '-'
 
-  return walletDateFormatter.format(new Date(year, month - 1, day))
+  return `${sign}${formatWalletCurrency(amount, currency)}`
+}
+
+export function formatWalletTransactionDate(value: string) {
+  return walletTransactionDateFormatter.format(new Date(value))
+}
+
+export function formatWalletTransactionId(value: string) {
+  return value.slice(0, 8).toUpperCase()
 }

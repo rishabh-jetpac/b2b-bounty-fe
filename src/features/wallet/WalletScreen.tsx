@@ -1,14 +1,61 @@
-import { Box, Paper, Stack, Typography } from '@mui/material'
+import { Button, CircularProgress, Paper, Stack, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
+import type { ReactNode } from 'react'
 import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
 import { colors } from '../../colors'
-import { mockWalletBalance, mockWalletTransactions } from './mockWalletTransactions'
-import { formatWalletAmount, formatWalletCurrency, formatWalletDate } from './walletFormatting'
+import { getApiErrorMessage } from '../../lib/api/errors'
+import { useWalletQuery } from './hooks/useWalletQuery'
+import { useWalletTransactionsQuery } from './hooks/useWalletTransactionsQuery'
+import type { WalletTransaction } from './types'
+import {
+  formatWalletCurrency,
+  formatWalletTransactionAmount,
+  formatWalletTransactionDate,
+  formatWalletTransactionId,
+  formatWalletUpdatedAt,
+} from './walletFormatting'
 
 export function WalletScreen() {
+  const walletQuery = useWalletQuery()
+  const walletTransactionsQuery = useWalletTransactionsQuery()
+
   useAuthenticatedHeader({
     title: 'Wallet',
   })
+
+  const walletErrorMessage = walletQuery.isError
+    ? getApiErrorMessage(
+        walletQuery.error,
+        'We could not load your wallet balance. Please try again.',
+      )
+    : ''
+
+  if (walletQuery.isPending) {
+    return <LoadingState />
+  }
+
+  if (walletQuery.isError || !walletQuery.data) {
+    return (
+      <StateCard
+        action={
+          <Button
+            onClick={() => {
+              void walletQuery.refetch()
+            }}
+            sx={stateActionButtonSx}
+            variant="contained"
+          >
+            Retry
+          </Button>
+        }
+        description={walletErrorMessage}
+        title="We could not load your wallet"
+      />
+    )
+  }
+
+  const wallet = walletQuery.data
+  const walletTransactions = walletTransactionsQuery.data ?? []
 
   return (
     <Stack spacing={2.25}>
@@ -26,29 +73,6 @@ export function WalletScreen() {
           boxShadow: `0 16px 32px ${alpha(colors.primary, 0.2)}`,
         }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            right: -40,
-            bottom: -56,
-            width: 156,
-            height: 156,
-            borderRadius: '50%',
-            backgroundColor: alpha(colors.surfaceContainerLowest, 0.12),
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            top: -36,
-            right: 28,
-            width: 92,
-            height: 92,
-            borderRadius: '50%',
-            backgroundColor: alpha(colors.surfaceContainerLowest, 0.1),
-          }}
-        />
-
         <Stack
           spacing={0.9}
           sx={{
@@ -72,7 +96,15 @@ export function WalletScreen() {
               lineHeight: 1.15,
             }}
           >
-            {formatWalletCurrency(mockWalletBalance)}
+            {formatWalletCurrency(wallet.balanceUsd)}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: alpha(colors.onPrimary, 0.84),
+            }}
+          >
+            {`Last updated ${formatWalletUpdatedAt(wallet.updatedAt)}`}
           </Typography>
         </Stack>
       </Paper>
@@ -88,89 +120,191 @@ export function WalletScreen() {
           Transaction History
         </Typography>
 
-        <Stack spacing={1.25}>
-          {mockWalletTransactions.map((transaction) => {
-            const amountColor =
-              transaction.type === 'credit'
-                ? colors.primaryContainer
-                : colors.error
-
-            return (
-              <Paper
-                key={transaction.id}
-                elevation={0}
-                sx={{
-                  borderRadius: '8px',
-                  border: `1px solid ${colors.outlineVariant}`,
-                  px: 2,
-                  py: 1.75,
-                  boxShadow: `0 10px 24px ${alpha(colors.primary, 0.05)}`,
+        {walletTransactionsQuery.isPending ? (
+          <LoadingHistoryState />
+        ) : walletTransactionsQuery.isError ? (
+          <StateCard
+            action={
+              <Button
+                onClick={() => {
+                  void walletTransactionsQuery.refetch()
                 }}
+                sx={stateActionButtonSx}
+                variant="contained"
               >
-                <Stack spacing={0.8}>
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    sx={{
-                      alignItems: 'flex-start',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        color: colors.onSurface,
-                        fontSize: '0.98rem',
-                        fontWeight: 600,
-                        lineHeight: 1.35,
-                      }}
-                    >
-                      {transaction.title}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        color: amountColor,
-                        fontSize: '0.98rem',
-                        fontWeight: 700,
-                        lineHeight: 1.35,
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {formatWalletAmount(transaction.amount, transaction.type)}
-                    </Typography>
-                  </Stack>
-
-                  <Stack
-                    direction="row"
-                    spacing={1.5}
-                    sx={{
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: colors.onSurfaceVariant,
-                      }}
-                    >
-                      {`Txn ID: ${transaction.transactionId}`}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: colors.onSurfaceVariant,
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {formatWalletDate(transaction.date)}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </Paper>
-            )
-          })}
-        </Stack>
+                Retry
+              </Button>
+            }
+            description={getApiErrorMessage(
+              walletTransactionsQuery.error,
+              'We could not load your transaction history. Please try again.',
+            )}
+            title="We could not load your history"
+          />
+        ) : walletTransactions.length === 0 ? (
+          <StateCard
+            description="Transactions will appear here once this wallet has activity."
+            title="No transaction history yet"
+          />
+        ) : (
+          <Stack spacing={1.25}>
+            {walletTransactions.map((transaction) => (
+              <TransactionCard key={transaction.id} transaction={transaction} />
+            ))}
+          </Stack>
+        )}
       </Stack>
     </Stack>
   )
 }
+
+function LoadingState() {
+  return (
+    <Paper elevation={0} sx={stateCardSx}>
+      <Stack
+        spacing={1.5}
+        sx={{
+          minHeight: 220,
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+        }}
+      >
+        <CircularProgress size={28} />
+        <Typography variant="h3" sx={{ color: colors.onSurface }}>
+          Loading wallet
+        </Typography>
+        <Typography sx={{ color: colors.onSurfaceVariant }}>
+          Fetching the latest wallet balance for this account.
+        </Typography>
+      </Stack>
+    </Paper>
+  )
+}
+
+function LoadingHistoryState() {
+  return (
+    <Paper elevation={0} sx={stateCardSx}>
+      <Stack spacing={1.25} sx={{ alignItems: 'center', py: 1.5, textAlign: 'center' }}>
+        <CircularProgress size={24} />
+        <Typography variant="body2" sx={{ color: colors.onSurfaceVariant }}>
+          Fetching the latest wallet transactions.
+        </Typography>
+      </Stack>
+    </Paper>
+  )
+}
+
+type TransactionCardProps = {
+  transaction: WalletTransaction
+}
+
+function TransactionCard({ transaction }: TransactionCardProps) {
+  const amountColor =
+    transaction.type === 'credit' ? colors.primaryContainer : colors.error
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        borderRadius: '8px',
+        border: `1px solid ${colors.outlineVariant}`,
+        px: 2,
+        py: 1.75,
+        backgroundColor: colors.surfaceContainerLowest,
+      }}
+    >
+      <Stack spacing={0.9}>
+        <Stack direction="row" spacing={1.5} sx={{ justifyContent: 'space-between' }}>
+          <Typography
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              color: colors.onSurface,
+              fontSize: '0.98rem',
+              fontWeight: 700,
+              lineHeight: 1.35,
+            }}
+          >
+            {transaction.title}
+          </Typography>
+          <Typography
+            sx={{
+              flexShrink: 0,
+              color: amountColor,
+              fontSize: '0.98rem',
+              fontWeight: 700,
+              lineHeight: 1.35,
+            }}
+          >
+            {formatWalletTransactionAmount(transaction.amountUsd, transaction.type)}
+          </Typography>
+        </Stack>
+
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            justifyContent: 'space-between',
+            color: colors.onSurfaceVariant,
+            fontSize: '0.8125rem',
+            lineHeight: 1.4,
+          }}
+        >
+          <Typography
+            sx={{
+              minWidth: 0,
+              color: 'inherit',
+              fontSize: 'inherit',
+            }}
+          >
+            {`Txn ID: ${formatWalletTransactionId(transaction.id)}`}
+          </Typography>
+          <Typography
+            sx={{
+              flexShrink: 0,
+              color: 'inherit',
+              fontSize: 'inherit',
+            }}
+          >
+            {formatWalletTransactionDate(transaction.createdAt)}
+          </Typography>
+        </Stack>
+      </Stack>
+    </Paper>
+  )
+}
+
+type StateCardProps = {
+  action?: ReactNode
+  description: string
+  title: string
+}
+
+function StateCard({ action, description, title }: StateCardProps) {
+  return (
+    <Paper elevation={0} sx={stateCardSx}>
+      <Stack spacing={1.5} sx={{ alignItems: 'flex-start' }}>
+        <Typography variant="h3" sx={{ color: colors.onSurface }}>
+          {title}
+        </Typography>
+        <Typography sx={{ color: colors.onSurfaceVariant }}>{description}</Typography>
+        {action ?? null}
+      </Stack>
+    </Paper>
+  )
+}
+
+const stateCardSx = {
+  borderRadius: '8px',
+  border: `1px solid ${colors.outlineVariant}`,
+  px: 2.5,
+  py: 3,
+} as const
+
+const stateActionButtonSx = {
+  backgroundColor: colors.primaryContainer,
+  '&:hover': {
+    backgroundColor: colors.primary,
+  },
+} as const

@@ -21,6 +21,9 @@ import type { Pack } from './types'
 
 type PurchaseSheetProps = {
   balance: number
+  errorMessage?: string
+  isBalancePending: boolean
+  isPending: boolean
   onClose: () => void
   onDecrease: () => void
   onIncrease: () => void
@@ -32,6 +35,9 @@ type PurchaseSheetProps = {
 
 export function PurchaseSheet({
   balance,
+  errorMessage,
+  isBalancePending,
+  isPending,
   onClose,
   onDecrease,
   onIncrease,
@@ -45,14 +51,14 @@ export function PurchaseSheet({
   }
 
   const totalPrice = getPackPriceValue(pack) * quantity
-  const hasInsufficientBalance = balance < totalPrice
+  const hasInsufficientBalance = !isBalancePending && balance < totalPrice
 
   return (
     <BottomSheet
-      allowBackgroundInteraction
+      allowBackgroundInteraction={!isPending}
       fullWidth
       hideHandle
-      onClose={onClose}
+      onClose={isPending ? noop : onClose}
       open={open}
       showCloseButton={false}
       showHeader={false}
@@ -60,6 +66,7 @@ export function PurchaseSheet({
       <Box sx={{ position: 'relative', pt: 1 }}>
         <IconButton
           aria-label="Close purchase sheet"
+          disabled={isPending}
           onClick={onClose}
           sx={{
             position: 'absolute',
@@ -128,7 +135,7 @@ export function PurchaseSheet({
               >
                 <IconButton
                   aria-label="Decrease quantity"
-                  disabled={quantity === 1}
+                  disabled={isPending || quantity === 1}
                   onClick={onDecrease}
                   sx={stepperButtonSx}
                 >
@@ -147,6 +154,7 @@ export function PurchaseSheet({
                 </Typography>
                 <IconButton
                   aria-label="Increase quantity"
+                  disabled={isPending}
                   onClick={onIncrease}
                   sx={stepperButtonSx}
                 >
@@ -155,6 +163,12 @@ export function PurchaseSheet({
               </Stack>
             </Box>
           </Stack>
+
+          {isBalancePending ? (
+            <Alert severity="info" variant="outlined">
+              Refreshing wallet balance before purchase.
+            </Alert>
+          ) : null}
 
           {hasInsufficientBalance ? (
             <Alert
@@ -169,9 +183,15 @@ export function PurchaseSheet({
             </Alert>
           ) : null}
 
+          {errorMessage ? (
+            <Alert severity="error" variant="outlined">
+              {errorMessage}
+            </Alert>
+          ) : null}
+
           <Stack spacing={1}>
             <Button
-              disabled={hasInsufficientBalance}
+              disabled={isPending || isBalancePending || hasInsufficientBalance}
               onClick={onPurchase}
               size="large"
               sx={{
@@ -182,7 +202,7 @@ export function PurchaseSheet({
               }}
               variant="contained"
             >
-              Buy now
+              {isPending ? 'Purchasing...' : 'Buy now'}
             </Button>
           </Stack>
         </Stack>
@@ -201,3 +221,5 @@ const stepperButtonSx = {
     borderColor: colors.outlineVariant,
   },
 } as const
+
+function noop() {}

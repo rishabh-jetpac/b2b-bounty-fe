@@ -16,6 +16,21 @@ export type Pack = {
   countryInfo?: CountryInfo
 }
 
+export type PurchasedInventoryItem = {
+  id: string
+  orgId: string
+  packId: string
+  packName: string
+  status: 'unassigned' | 'assigned' | 'failed'
+  purchasedAt: string
+}
+
+export type PurchaseResult = {
+  quantity: number
+  packName: string
+  items: PurchasedInventoryItem[]
+}
+
 export type PacksFilters = {
   country?: string
   validityInDays?: number

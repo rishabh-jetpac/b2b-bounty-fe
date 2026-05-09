@@ -57,6 +57,8 @@ export function AuthenticatedLayout() {
     navigate('/login', { replace: true })
   }
 
+  const roleLabel = formatRoleLabel(user?.role)
+
   return (
     <Box
       sx={{
@@ -257,6 +259,32 @@ export function AuthenticatedLayout() {
                   {user?.orgName ?? ''}
                 </Typography>
               </Box>
+
+              <Divider sx={{ borderColor: colors.outlineVariant }} />
+
+              <Box>
+                <Typography
+                  sx={{
+                    color: colors.onSurfaceVariant,
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Role
+                </Typography>
+                <Typography
+                  sx={{
+                    color: colors.onSurface,
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {roleLabel}
+                </Typography>
+              </Box>
             </Stack>
           </Paper>
 
@@ -340,6 +368,18 @@ export function AuthenticatedLayout() {
       ) : null}
     </Box>
   )
+}
+
+function formatRoleLabel(role?: string) {
+  if (!role) {
+    return ''
+  }
+
+  return role
+    .split(/[_-\s]+/)
+    .filter(Boolean)
+    .map((segment) => segment[0]?.toUpperCase() + segment.slice(1))
+    .join(' ')
 }
 
 const bottomNavigationActionSx = {

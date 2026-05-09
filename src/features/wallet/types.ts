@@ -1,10 +1,20 @@
+export type Wallet = {
+  id: string
+  orgId: string
+  balanceUsdCents: number
+  balanceUsd: number
+  updatedAt: string
+}
+
 export type WalletTransactionType = 'debit' | 'credit'
 
 export type WalletTransaction = {
   id: string
-  title: string
-  transactionId: string
-  date: string
-  amount: number
+  orgId: string
   type: WalletTransactionType
+  amountUsdCents: number
+  amountUsd: number
+  reason: string
+  title: string
+  createdAt: string
 }
