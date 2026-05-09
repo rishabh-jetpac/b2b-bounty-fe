@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import { type ReactNode, useState } from 'react'
 import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
+import { PullToRefreshContainer } from '../../components/PullToRefreshContainer'
 import { colors } from '../../colors'
 import { getApiErrorMessage } from '../../lib/api/errors'
 import { useWalletQuery } from '../wallet/hooks/useWalletQuery'
@@ -99,6 +100,10 @@ export function PacksScreen() {
       )
     : ''
 
+  async function handleBalanceRefresh() {
+    await walletQuery.refetch()
+  }
+
   function handleSelectPack(pack: Pack) {
     purchaseMutation.reset()
     setSelectedPack(pack)
@@ -149,143 +154,151 @@ export function PacksScreen() {
 
   return (
     <>
-      <Stack
-        spacing={2.25}
+      <Box
         sx={{
           pb: selectedPack ? { xs: 27, sm: 31 } : 0,
         }}
       >
-        {packs.length > 0 ? (
-          <Box
-            sx={{
-              position: 'sticky',
-              top: { xs: '58px', sm: '62px' },
-              zIndex: (theme) => theme.zIndex.appBar - 1,
-              backgroundColor: colors.background,
-              py: '4px',
-            }}
-          >
-            <Stack
-              direction="row"
-              spacing={1}
+        <Stack spacing={2.25}>
+          {packs.length > 0 ? (
+            <Box
               sx={{
-                alignItems: 'center',
-                flexWrap: 'wrap',
+                position: 'sticky',
+                top: { xs: '58px', sm: '62px' },
+                zIndex: (theme) => theme.zIndex.appBar - 1,
+                backgroundColor: colors.background,
+                py: '4px',
               }}
             >
-              <Chip
-                clickable
-                label={filters.country ?? 'Country'}
-                onClick={() => setActiveSheet('country')}
-                sx={getFilterChipSx(filters.country !== undefined)}
-              />
-              <Chip
-                clickable
-                label={
-                  filters.validityInDays !== undefined
-                    ? formatValidity(filters.validityInDays)
-                    : 'Validity'
-                }
-                onClick={() => setActiveSheet('validityInDays')}
-                sx={getFilterChipSx(filters.validityInDays !== undefined)}
-              />
-              <Chip
-                clickable
-                label={
-                  filters.dataInGB !== undefined
-                    ? formatDataAmount(filters.dataInGB)
-                    : 'GB'
-                }
-                onClick={() => setActiveSheet('dataInGB')}
-                sx={getFilterChipSx(filters.dataInGB !== undefined)}
-              />
-              {hasActiveFilters ? (
-                <Button
-                  color="inherit"
-                  onClick={() => setFilters({})}
-                  size="small"
-                  startIcon={<HighlightOffOutlinedIcon />}
-                  sx={{
-                    color: colors.primaryContainer,
-                    ml: 'auto',
-                    px: 1.5,
-                    py: 0.25,
-                    minHeight: 30,
-                    border: `1px solid ${colors.outlineVariant}`,
-                    borderRadius: 999,
-                    backgroundColor: colors.surfaceContainerLowest,
-                  }}
-                  variant="outlined"
-                >
-                  Clear
-                </Button>
-              ) : null}
-            </Stack>
-          </Box>
-        ) : null}
-
-        {packsQuery.isPending ? (
-          <LoadingState />
-        ) : packsQuery.isError && packs.length === 0 ? (
-          <StateCard
-            action={
-              <Button
-                onClick={() => {
-                  void packsQuery.refetch()
-                }}
-                sx={stateActionButtonSx}
-                variant="contained"
-              >
-                Retry
-              </Button>
-            }
-            description={packsErrorMessage}
-            title="We could not load packs"
-          />
-        ) : packs.length === 0 ? (
-          <StateCard
-            description="The active catalog is empty right now. Please check again later."
-            title="No active packs available"
-          />
-        ) : filteredPacks.length > 0 ? (
-          <Stack spacing={2}>
-            {filteredPacks.map((pack) => (
-              <PackCard
-                key={pack.id}
-                onSelect={() => handleSelectPack(pack)}
-                pack={pack}
-                selected={selectedPack?.id === pack.id}
-              />
-            ))}
-          </Stack>
-        ) : (
-          <Paper
-            elevation={0}
-            sx={{
-              ...stateCardSx,
-            }}
-          >
-            <Stack spacing={1.5} sx={{ alignItems: 'flex-start' }}>
-              <Typography variant="h3" sx={{ color: colors.onSurface }}>
-                No packs match these filters
-              </Typography>
-              <Typography sx={{ color: colors.onSurfaceVariant }}>
-                Clear filters to bring the full catalog back into view.
-              </Typography>
-              <Button
-                onClick={() => setFilters({})}
+              <Stack
+                direction="row"
+                spacing={1}
                 sx={{
-                  color: colors.primaryContainer,
-                  alignSelf: 'center',
-                  px: 2.5,
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
                 }}
               >
+                <Chip
+                  clickable
+                  label={filters.country ?? 'Country'}
+                  onClick={() => setActiveSheet('country')}
+                  sx={getFilterChipSx(filters.country !== undefined)}
+                />
+                <Chip
+                  clickable
+                  label={
+                    filters.validityInDays !== undefined
+                      ? formatValidity(filters.validityInDays)
+                      : 'Validity'
+                  }
+                  onClick={() => setActiveSheet('validityInDays')}
+                  sx={getFilterChipSx(filters.validityInDays !== undefined)}
+                />
+                <Chip
+                  clickable
+                  label={
+                    filters.dataInGB !== undefined
+                      ? formatDataAmount(filters.dataInGB)
+                      : 'GB'
+                  }
+                  onClick={() => setActiveSheet('dataInGB')}
+                  sx={getFilterChipSx(filters.dataInGB !== undefined)}
+                />
+                {hasActiveFilters ? (
+                  <Button
+                    color="inherit"
+                    onClick={() => setFilters({})}
+                    size="small"
+                    startIcon={<HighlightOffOutlinedIcon />}
+                    sx={{
+                      color: colors.primaryContainer,
+                      ml: 'auto',
+                      px: 1.5,
+                      py: 0.25,
+                      minHeight: 30,
+                      border: `1px solid ${colors.outlineVariant}`,
+                      borderRadius: 999,
+                      backgroundColor: colors.surfaceContainerLowest,
+                    }}
+                    variant="outlined"
+                  >
+                    Clear
+                  </Button>
+                ) : null}
+              </Stack>
+            </Box>
+          ) : null}
+
+          <PullToRefreshContainer
+            isPullable={selectedPack === null}
+            onRefresh={handleBalanceRefresh}
+          >
+            <Box>
+              {packsQuery.isPending ? (
+              <LoadingState />
+            ) : packsQuery.isError && packs.length === 0 ? (
+              <StateCard
+                action={
+                  <Button
+                    onClick={() => {
+                      void packsQuery.refetch()
+                    }}
+                    sx={stateActionButtonSx}
+                    variant="contained"
+                  >
+                    Retry
+                  </Button>
+                }
+                description={packsErrorMessage}
+                title="We could not load packs"
+              />
+            ) : packs.length === 0 ? (
+              <StateCard
+                description="The active catalog is empty right now. Please check again later."
+                title="No active packs available"
+              />
+            ) : filteredPacks.length > 0 ? (
+              <Stack spacing={2}>
+                {filteredPacks.map((pack) => (
+                  <PackCard
+                    key={pack.id}
+                    onSelect={() => handleSelectPack(pack)}
+                    pack={pack}
+                    selected={selectedPack?.id === pack.id}
+                  />
+                ))}
+              </Stack>
+            ) : (
+              <Paper
+                elevation={0}
+                sx={{
+                  ...stateCardSx,
+                }}
+              >
+                <Stack spacing={1.5} sx={{ alignItems: 'flex-start' }}>
+                  <Typography variant="h3" sx={{ color: colors.onSurface }}>
+                    No packs match these filters
+                  </Typography>
+                  <Typography sx={{ color: colors.onSurfaceVariant }}>
+                    Clear filters to bring the full catalog back into view.
+                  </Typography>
+                  <Button
+                    onClick={() => setFilters({})}
+                    sx={{
+                      color: colors.primaryContainer,
+                      alignSelf: 'center',
+                      px: 2.5,
+                    }}
+                  >
                 Clear filters
               </Button>
             </Stack>
           </Paper>
         )}
-      </Stack>
+            </Box>
+          </PullToRefreshContainer>
+        </Stack>
+      </Box>
 
       <FilterSheet
         hideHandle

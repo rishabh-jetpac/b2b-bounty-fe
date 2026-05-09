@@ -2,6 +2,7 @@ import { Button, CircularProgress, Paper, Stack, Typography } from '@mui/materia
 import { alpha } from '@mui/material/styles'
 import type { ReactNode } from 'react'
 import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
+import { PullToRefreshContainer } from '../../components/PullToRefreshContainer'
 import { colors } from '../../colors'
 import { getApiErrorMessage } from '../../lib/api/errors'
 import { useWalletQuery } from './hooks/useWalletQuery'
@@ -30,27 +31,33 @@ export function WalletScreen() {
       )
     : ''
 
+  async function handleRefresh() {
+    await Promise.all([walletQuery.refetch(), walletTransactionsQuery.refetch()])
+  }
+
   if (walletQuery.isPending) {
     return <LoadingState />
   }
 
   if (walletQuery.isError || !walletQuery.data) {
     return (
-      <StateCard
-        action={
-          <Button
-            onClick={() => {
-              void walletQuery.refetch()
-            }}
-            sx={stateActionButtonSx}
-            variant="contained"
-          >
-            Retry
-          </Button>
-        }
-        description={walletErrorMessage}
-        title="We could not load your wallet"
-      />
+      <PullToRefreshContainer onRefresh={handleRefresh}>
+        <StateCard
+          action={
+            <Button
+              onClick={() => {
+                void handleRefresh()
+              }}
+              sx={stateActionButtonSx}
+              variant="contained"
+            >
+              Retry
+            </Button>
+          }
+          description={walletErrorMessage}
+          title="We could not load your wallet"
+        />
+      </PullToRefreshContainer>
     )
   }
 
@@ -58,103 +65,105 @@ export function WalletScreen() {
   const walletTransactions = walletTransactionsQuery.data ?? []
 
   return (
-    <Stack spacing={2.25}>
-      <Paper
-        elevation={0}
-        sx={{
-          position: 'relative',
-          overflow: 'hidden',
-          minHeight: { xs: 108, sm: 118 },
-          borderRadius: '8px',
-          px: 2.5,
-          py: 2,
-          background: `linear-gradient(135deg, ${colors.primaryContainer} 0%, ${colors.primary} 100%)`,
-          color: colors.onPrimary,
-          boxShadow: `0 16px 32px ${alpha(colors.primary, 0.2)}`,
-        }}
-      >
-        <Stack
-          spacing={0.9}
+    <PullToRefreshContainer onRefresh={handleRefresh}>
+      <Stack spacing={2.25}>
+        <Paper
+          elevation={0}
           sx={{
             position: 'relative',
-            zIndex: 1,
+            overflow: 'hidden',
+            minHeight: { xs: 108, sm: 118 },
+            borderRadius: '8px',
+            px: 2.5,
+            py: 2,
+            background: `linear-gradient(135deg, ${colors.primaryContainer} 0%, ${colors.primary} 100%)`,
+            color: colors.onPrimary,
+            boxShadow: `0 16px 32px ${alpha(colors.primary, 0.2)}`,
           }}
         >
-          <Typography
-            variant="overline"
+          <Stack
+            spacing={0.9}
             sx={{
-              color: alpha(colors.onPrimary, 0.84),
+              position: 'relative',
+              zIndex: 1,
             }}
           >
-            Total Balance
-          </Typography>
-          <Typography
-            variant="h2"
-            sx={{
-              color: colors.onPrimary,
-              fontSize: { xs: '1.95rem', sm: '2.15rem' },
-              lineHeight: 1.15,
-            }}
-          >
-            {formatWalletCurrency(wallet.balanceUsd)}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              color: alpha(colors.onPrimary, 0.84),
-            }}
-          >
-            {`Last updated ${formatWalletUpdatedAt(wallet.updatedAt)}`}
-          </Typography>
-        </Stack>
-      </Paper>
-
-      <Stack spacing={1.25}>
-        <Typography
-          variant="h3"
-          sx={{
-            color: colors.onSurface,
-            fontSize: { xs: '1rem', sm: '1.05rem' },
-          }}
-        >
-          Transaction History
-        </Typography>
-
-        {walletTransactionsQuery.isPending ? (
-          <LoadingHistoryState />
-        ) : walletTransactionsQuery.isError ? (
-          <StateCard
-            action={
-              <Button
-                onClick={() => {
-                  void walletTransactionsQuery.refetch()
-                }}
-                sx={stateActionButtonSx}
-                variant="contained"
-              >
-                Retry
-              </Button>
-            }
-            description={getApiErrorMessage(
-              walletTransactionsQuery.error,
-              'We could not load your transaction history. Please try again.',
-            )}
-            title="We could not load your history"
-          />
-        ) : walletTransactions.length === 0 ? (
-          <StateCard
-            description="Transactions will appear here once this wallet has activity."
-            title="No transaction history yet"
-          />
-        ) : (
-          <Stack spacing={1.25}>
-            {walletTransactions.map((transaction) => (
-              <TransactionCard key={transaction.id} transaction={transaction} />
-            ))}
+            <Typography
+              variant="overline"
+              sx={{
+                color: alpha(colors.onPrimary, 0.84),
+              }}
+            >
+              Total Balance
+            </Typography>
+            <Typography
+              variant="h2"
+              sx={{
+                color: colors.onPrimary,
+                fontSize: { xs: '1.95rem', sm: '2.15rem' },
+                lineHeight: 1.15,
+              }}
+            >
+              {formatWalletCurrency(wallet.balanceUsd)}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: alpha(colors.onPrimary, 0.84),
+              }}
+            >
+              {`Last updated ${formatWalletUpdatedAt(wallet.updatedAt)}`}
+            </Typography>
           </Stack>
-        )}
+        </Paper>
+
+        <Stack spacing={1.25}>
+          <Typography
+            variant="h3"
+            sx={{
+              color: colors.onSurface,
+              fontSize: { xs: '1rem', sm: '1.05rem' },
+            }}
+          >
+            Transaction History
+          </Typography>
+
+          {walletTransactionsQuery.isPending ? (
+            <LoadingHistoryState />
+          ) : walletTransactionsQuery.isError ? (
+            <StateCard
+              action={
+                <Button
+                  onClick={() => {
+                    void handleRefresh()
+                  }}
+                  sx={stateActionButtonSx}
+                  variant="contained"
+                >
+                  Retry
+                </Button>
+              }
+              description={getApiErrorMessage(
+                walletTransactionsQuery.error,
+                'We could not load your transaction history. Please try again.',
+              )}
+              title="We could not load your history"
+            />
+          ) : walletTransactions.length === 0 ? (
+            <StateCard
+              description="Transactions will appear here once this wallet has activity."
+              title="No transaction history yet"
+            />
+          ) : (
+            <Stack spacing={1.25}>
+              {walletTransactions.map((transaction) => (
+                <TransactionCard key={transaction.id} transaction={transaction} />
+              ))}
+            </Stack>
+          )}
+        </Stack>
       </Stack>
-    </Stack>
+    </PullToRefreshContainer>
   )
 }
 
