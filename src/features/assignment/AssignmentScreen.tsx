@@ -1,0 +1,439 @@
+import { yupResolver } from '@hookform/resolvers/yup'
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded'
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  Snackbar,
+  Stack,
+  Typography,
+} from '@mui/material'
+import { alpha } from '@mui/material/styles'
+import { useEffect, useState } from 'react'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { useNavigate, useParams } from 'react-router'
+import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
+import { colors } from '../../colors'
+import { AssignmentRecipientCard } from './AssignmentRecipientCard'
+import {
+  assignmentDefaultValues,
+  createAssignmentSchema,
+} from './assignmentSchemas'
+import { useOrderQuery } from './hooks/useOrderQuery'
+import { useSubmitAssignmentsMutation } from './hooks/useSubmitAssignmentsMutation'
+import type { AssignmentFormValues, OrderResponse } from './types'
+
+export function AssignmentScreen() {
+  const navigate = useNavigate()
+  const { orderId } = useParams()
+
+  useAuthenticatedHeader({
+    hideBottomNavigation: true,
+    title: 'Inventory',
+  })
+
+  const orderQuery = useOrderQuery(orderId)
+
+  if (orderQuery.isLoading) {
+    return (
+      <Stack
+        sx={{
+          minHeight: '60svh',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Stack>
+    )
+  }
+
+  if (!orderId || orderQuery.isError || !orderQuery.data) {
+    return (
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: '16px',
+          border: `1px solid ${colors.outlineVariant}`,
+          px: 2.5,
+          py: 3,
+        }}
+      >
+        <Stack spacing={2}>
+          <Typography variant="h3" sx={{ color: colors.onSurface }}>
+            This purchase could not be loaded
+          </Typography>
+          <Typography sx={{ color: colors.onSurfaceVariant }}>
+            Mock orders only exist in memory for the current session, so refreshing
+            or opening the link directly will not restore the purchase.
+          </Typography>
+          <Button
+            onClick={() => navigate('/packs')}
+            sx={{
+              alignSelf: 'flex-start',
+              backgroundColor: colors.primaryContainer,
+              '&:hover': {
+                backgroundColor: colors.primary,
+              },
+            }}
+            variant="contained"
+          >
+            Go back
+          </Button>
+        </Stack>
+      </Paper>
+    )
+  }
+
+  return <AssignmentScreenContent order={orderQuery.data} />
+}
+
+type AssignmentScreenContentProps = {
+  order: OrderResponse
+}
+
+function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
+  const navigate = useNavigate()
+  const submitAssignmentsMutation = useSubmitAssignmentsMutation()
+  const [successOpen, setSuccessOpen] = useState(false)
+
+  const {
+    control,
+    formState: { errors, isValid },
+    handleSubmit,
+    register,
+    setValue,
+  } = useForm<AssignmentFormValues>({
+    defaultValues: assignmentDefaultValues,
+    mode: 'onChange',
+    resolver: yupResolver(createAssignmentSchema(order.quantity)),
+  })
+
+  const { append, fields, remove } = useFieldArray({
+    control,
+    name: 'assignments',
+  })
+
+  const assignments = useWatch({
+    control,
+    name: 'assignments',
+  }) ?? []
+  const totalAssigned = assignments.reduce(
+    (sum, assignment) => sum + (assignment.quantity || 0),
+    0,
+  )
+  const remaining = Math.max(order.quantity - totalAssigned, 0)
+  const hasRows = fields.length > 0
+  const exceedsTotal = totalAssigned > order.quantity
+  const assignNowDisabled =
+    !hasRows || exceedsTotal || !isValid || submitAssignmentsMutation.isPending
+
+  useEffect(() => {
+    if (!successOpen) {
+      return undefined
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      navigate('/inventory')
+    }, 900)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [navigate, successOpen])
+
+  const onSubmit = handleSubmit(async (values) => {
+    await submitAssignmentsMutation.mutateAsync({
+      order_id: order.order_id,
+      assignments: values.assignments.map((assignment) => ({
+        email: assignment.email.trim(),
+        quantity: assignment.quantity,
+      })),
+    })
+
+    setSuccessOpen(true)
+  })
+
+  function updateQuantity(index: number, direction: 'increase' | 'decrease') {
+    const currentQuantity = assignments[index]?.quantity ?? 1
+    const otherRowsQuantity = assignments.reduce((sum, assignment, rowIndex) => {
+      if (rowIndex === index) {
+        return sum
+      }
+
+      return sum + assignment.quantity
+    }, 0)
+    const maxQuantity = Math.max(order.quantity - otherRowsQuantity, 1)
+    const nextQuantity =
+      direction === 'increase'
+        ? Math.min(currentQuantity + 1, maxQuantity)
+        : Math.max(currentQuantity - 1, 1)
+
+    setValue(`assignments.${index}.quantity`, nextQuantity, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    })
+  }
+
+  function handleAddRecipient() {
+    if (remaining <= 0) {
+      return
+    }
+
+    append({
+      email: '',
+      quantity: 1,
+    })
+  }
+
+  return (
+    <>
+      <Stack spacing={2.25}>
+        <Paper
+          elevation={0}
+          sx={{
+            borderRadius: '16px',
+            px: 2,
+            py: 1.5,
+            backgroundColor: colors.primaryContainer,
+            color: colors.onPrimary,
+          }}
+        >
+          <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+            <CheckCircleRoundedIcon
+              sx={{
+                fontSize: 30,
+              }}
+            />
+            <Typography
+              sx={{
+                color: colors.onPrimary,
+                fontSize: '1rem',
+                lineHeight: 1.45,
+              }}
+            >
+              {`Purchase successful - ${order.pack.displayName} (x${order.quantity})`}
+            </Typography>
+          </Stack>
+        </Paper>
+
+        <Paper
+          elevation={0}
+          sx={{
+            borderRadius: '20px',
+            border: `1px solid ${colors.outlineVariant}`,
+            px: 2.5,
+            py: 2.25,
+            boxShadow: `0 14px 32px ${alpha(colors.primary, 0.06)}`,
+          }}
+        >
+          <Stack spacing={2}>
+            <Typography
+              variant="h2"
+              sx={{
+                color: colors.onSurface,
+                fontSize: { xs: '1.85rem', sm: '2rem' },
+                lineHeight: 1.15,
+              }}
+            >
+              {order.pack.displayName}
+            </Typography>
+
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: 1.5,
+              }}
+            >
+              <SummaryTile label="Total Quantity" value={order.quantity} />
+              <SummaryTile
+                accent
+                label="Remaining"
+                value={remaining}
+              />
+            </Box>
+          </Stack>
+        </Paper>
+
+        <Stack component="form" noValidate onSubmit={onSubmit} spacing={2.25}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Typography variant="h2" sx={{ color: colors.onSurface }}>
+              Assign Packages
+            </Typography>
+            <Typography variant="overline" sx={{ color: colors.onSurfaceVariant }}>
+              Step 1 of 2
+            </Typography>
+          </Stack>
+
+          <Stack spacing={1.5}>
+            {fields.map((field, index) => {
+              const otherRowsQuantity = assignments.reduce(
+                (sum, assignment, rowIndex) => {
+                  if (rowIndex === index) {
+                    return sum
+                  }
+
+                  return sum + assignment.quantity
+                },
+                0,
+              )
+              const maxQuantity = Math.max(order.quantity - otherRowsQuantity, 1)
+
+              return (
+                <AssignmentRecipientCard
+                  key={field.id}
+                  emailError={errors.assignments?.[index]?.email}
+                  emailName={`assignments.${index}.email`}
+                  maxQuantity={maxQuantity}
+                  onDecrease={() => updateQuantity(index, 'decrease')}
+                  onIncrease={() => updateQuantity(index, 'increase')}
+                  onRemove={() => remove(index)}
+                  quantity={assignments[index]?.quantity ?? 1}
+                  quantityError={errors.assignments?.[index]?.quantity}
+                  register={register}
+                />
+              )
+            })}
+
+            <Button
+              disabled={remaining === 0}
+              onClick={handleAddRecipient}
+              startIcon={<AddCircleOutlineRoundedIcon />}
+              type="button"
+              sx={{
+                minHeight: 56,
+                borderRadius: '16px',
+                borderStyle: 'dashed',
+                color: colors.onSurfaceVariant,
+                backgroundColor: colors.surfaceContainerLowest,
+                boxShadow: 'none',
+                '&:hover': {
+                  backgroundColor: colors.surfaceContainerLow,
+                  boxShadow: 'none',
+                },
+                '&.Mui-disabled': {
+                  borderColor: colors.outlineVariant,
+                },
+              }}
+              variant="outlined"
+            >
+              Add Recipient
+            </Button>
+
+            {typeof errors.assignments?.message === 'string' ? (
+              <Alert severity="error" variant="outlined">
+                {errors.assignments.message}
+              </Alert>
+            ) : null}
+
+            {submitAssignmentsMutation.isError ? (
+              <Alert severity="error" variant="outlined">
+                Something went wrong while assigning the order. Please try again.
+              </Alert>
+            ) : null}
+          </Stack>
+
+          <Stack spacing={1.25} sx={{ pt: 1.5 }}>
+            <Button
+              disabled={assignNowDisabled}
+              size="large"
+              sx={{
+                backgroundColor: colors.primaryContainer,
+                '&:hover': {
+                  backgroundColor: colors.primary,
+                },
+              }}
+              type="submit"
+              variant="contained"
+            >
+              {submitAssignmentsMutation.isPending ? 'Assigning...' : 'Assign now'}
+            </Button>
+            <Button
+              onClick={() => navigate('/packs')}
+              size="large"
+              type="button"
+              sx={{
+                color: colors.primaryContainer,
+                borderColor: colors.primaryContainer,
+                backgroundColor: colors.surfaceContainerLowest,
+                boxShadow: 'none',
+                '&:hover': {
+                  borderColor: colors.primary,
+                  backgroundColor: alpha(colors.primaryFixed, 0.28),
+                  boxShadow: 'none',
+                },
+              }}
+              variant="outlined"
+            >
+              Assign later
+            </Button>
+          </Stack>
+        </Stack>
+      </Stack>
+
+      <Snackbar
+        autoHideDuration={1200}
+        onClose={() => setSuccessOpen(false)}
+        open={successOpen}
+      >
+        <Alert severity="success" sx={{ width: '100%' }} variant="filled">
+          Assignment submitted successfully.
+        </Alert>
+      </Snackbar>
+    </>
+  )
+}
+
+type SummaryTileProps = {
+  accent?: boolean
+  label: string
+  value: number
+}
+
+function SummaryTile({ accent = false, label, value }: SummaryTileProps) {
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        borderRadius: '14px',
+        border: `1px solid ${alpha(colors.outlineVariant, 0.75)}`,
+        px: 1.75,
+        py: 1.5,
+        backgroundColor: colors.surfaceContainerLow,
+      }}
+    >
+      <Stack spacing={0.75}>
+        <Typography
+          variant="overline"
+          sx={{
+            color: colors.onSurfaceVariant,
+          }}
+        >
+          {label}
+        </Typography>
+        <Typography
+          sx={{
+            color: accent ? colors.primaryContainer : colors.onSurface,
+            fontSize: '1.7rem',
+            fontWeight: 700,
+            lineHeight: 1.1,
+          }}
+        >
+          {value}
+        </Typography>
+      </Stack>
+    </Paper>
+  )
+}

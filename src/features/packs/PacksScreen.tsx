@@ -1,17 +1,17 @@
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined'
 import {
-  Alert,
   Box,
   Button,
   Chip,
   Paper,
-  Snackbar,
   Stack,
   Typography,
 } from '@mui/material'
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
 import { colors } from '../../colors'
+import { createMockOrderFromPurchase } from '../assignment/services/mockOrderService'
 import { FilterSheet } from './FilterSheet'
 import { mockPacks } from './mockPacks'
 import {
@@ -27,12 +27,12 @@ import type { FilterSheetKey, Pack, PacksFilters } from './types'
 const startingBalance = 1250
 
 export function PacksScreen() {
+  const navigate = useNavigate()
   const [balance, setBalance] = useState(startingBalance)
   const [selectedPack, setSelectedPack] = useState<Pack | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [filters, setFilters] = useState<PacksFilters>({})
   const [activeSheet, setActiveSheet] = useState<FilterSheetKey | null>(null)
-  const [snackbarMessage, setSnackbarMessage] = useState('')
 
   useAuthenticatedHeader({
     hideBottomNavigation: selectedPack !== null,
@@ -95,7 +95,7 @@ export function PacksScreen() {
     setQuantity(1)
   }
 
-  function handlePurchase() {
+  async function handlePurchase() {
     if (!selectedPack) {
       return
     }
@@ -105,11 +105,11 @@ export function PacksScreen() {
       return
     }
 
-    setBalance((currentBalance) =>
-      Number((currentBalance - totalPrice).toFixed(2)),
-    )
-    setSnackbarMessage(`Purchased ${quantity} x ${selectedPack.name}.`)
+    const order = await createMockOrderFromPurchase(selectedPack, quantity)
+
+    setBalance((currentBalance) => Number((currentBalance - totalPrice).toFixed(2)))
     handleClosePurchaseSheet()
+    navigate(`/inventory/${order.order_id}`)
   }
 
   function updateFilter<TKey extends keyof PacksFilters>(
@@ -241,6 +241,7 @@ export function PacksScreen() {
       </Stack>
 
       <FilterSheet
+        hideHandle
         onClear={() => {
           updateFilter('country', undefined)
           setActiveSheet(null)
@@ -260,6 +261,7 @@ export function PacksScreen() {
       />
 
       <FilterSheet
+        hideHandle
         onClear={() => {
           updateFilter('validityInDays', undefined)
           setActiveSheet(null)
@@ -279,6 +281,7 @@ export function PacksScreen() {
       />
 
       <FilterSheet
+        hideHandle
         onClear={() => {
           updateFilter('dataInGB', undefined)
           setActiveSheet(null)
@@ -307,21 +310,6 @@ export function PacksScreen() {
         pack={selectedPack}
         quantity={quantity}
       />
-
-      <Snackbar
-        autoHideDuration={3500}
-        onClose={() => setSnackbarMessage('')}
-        open={snackbarMessage.length > 0}
-      >
-        <Alert
-          onClose={() => setSnackbarMessage('')}
-          severity="success"
-          sx={{ width: '100%' }}
-          variant="filled"
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </>
   )
 }

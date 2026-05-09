@@ -16,6 +16,7 @@ type FilterSheetOption<TValue extends string | number> = {
 }
 
 type FilterSheetProps<TValue extends string | number> = {
+  hideHandle?: boolean
   onClear: () => void
   onClose: () => void
   onSelect: (value: TValue) => void
@@ -26,6 +27,7 @@ type FilterSheetProps<TValue extends string | number> = {
 }
 
 export function FilterSheet<TValue extends string | number>({
+  hideHandle = false,
   onClear,
   onClose,
   onSelect,
@@ -35,7 +37,13 @@ export function FilterSheet<TValue extends string | number>({
   title,
 }: FilterSheetProps<TValue>) {
   return (
-    <BottomSheet onClose={onClose} open={open} title={title} zIndex={1400}>
+    <BottomSheet
+      hideHandle={hideHandle}
+      onClose={onClose}
+      open={open}
+      title={title}
+      zIndex={1400}
+    >
       <Stack spacing={2}>
         <List disablePadding sx={{ mx: -1 }}>
           {options.map((option) => {
