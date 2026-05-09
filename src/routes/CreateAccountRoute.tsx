@@ -3,20 +3,23 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined'
 import LoginIcon from '@mui/icons-material/Login'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { Button, Stack } from '@mui/material'
+import { Alert, Button, Stack } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { colors } from '../colors'
 import { AuthLayout } from '../features/auth/AuthLayout'
 import { AuthTextField } from '../features/auth/AuthTextField'
+import { useRegisterMutation } from '../features/auth/hooks/useRegisterMutation'
 import {
   createAccountDefaultValues,
   createAccountSchema,
   type CreateAccountFormValues,
 } from '../features/auth/authSchemas'
+import { getApiErrorMessage } from '../lib/api/errors'
 
 function CreateAccountRoute() {
   const navigate = useNavigate()
+  const registerMutation = useRegisterMutation()
   const {
     register,
     handleSubmit,
@@ -26,8 +29,16 @@ function CreateAccountRoute() {
     resolver: yupResolver(createAccountSchema),
   })
 
-  const onSubmit = async () => {
-    navigate('/packs')
+  const onSubmit = async (values: CreateAccountFormValues) => {
+    registerMutation.reset()
+
+    const response = await registerMutation.mutateAsync({
+      email: values.email,
+      org_name: values.organizationName,
+      password: values.password,
+    })
+
+    navigate(response.data?.token ? '/packs' : '/login', { replace: true })
   }
 
   return (
@@ -74,11 +85,19 @@ function CreateAccountRoute() {
             registration={register('confirmPassword')}
             type="password"
           />
+          {registerMutation.isError ? (
+            <Alert severity="error" variant="outlined">
+              {getApiErrorMessage(
+                registerMutation.error,
+                'Account creation failed. Please try again.',
+              )}
+            </Alert>
+          ) : null}
         </Stack>
 
         <Stack spacing={2.5} sx={{ pt: 4 }}>
           <Button
-            disabled={isSubmitting}
+            disabled={isSubmitting || registerMutation.isPending}
             endIcon={<LoginIcon />}
             size="large"
             sx={{

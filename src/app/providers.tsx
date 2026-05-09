@@ -1,17 +1,24 @@
 import type { ReactNode } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { CssBaseline, ThemeProvider } from '@mui/material'
+import { useEffect } from 'react'
 import { theme } from './theme'
-
-const queryClient = new QueryClient()
+import { appQueryClient } from './queryClient'
+import { useAuthStore } from '../store/authStore'
 
 interface AppProvidersProps {
   children: ReactNode
 }
 
 export function AppProviders({ children }: AppProvidersProps) {
+  const initializeAuth = useAuthStore((state) => state.initializeAuth)
+
+  useEffect(() => {
+    initializeAuth()
+  }, [initializeAuth])
+
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={appQueryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {children}
@@ -19,4 +26,3 @@ export function AppProviders({ children }: AppProvidersProps) {
     </QueryClientProvider>
   )
 }
-

@@ -1,5 +1,6 @@
-import { createBrowserRouter, Navigate } from 'react-router'
+import { createBrowserRouter } from 'react-router'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
+import { GuestOnlyRoute, ProtectedRoute, RootRedirect } from './AuthGate'
 import CreateAccountRoute from '../routes/CreateAccountRoute'
 import HistoryRoute from '../routes/HistoryRoute'
 import InventoryAssignmentRoute from '../routes/InventoryAssignmentRoute'
@@ -10,39 +11,49 @@ import WalletRoute from '../routes/WalletRoute'
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate replace to="/packs" />,
+    element: <RootRedirect />,
   },
   {
-    path: '/login',
-    element: <LoginRoute />,
-  },
-  {
-    path: '/create-account',
-    element: <CreateAccountRoute />,
-  },
-  {
-    element: <AuthenticatedLayout />,
+    element: <GuestOnlyRoute />,
     children: [
       {
-        path: '/packs',
-        element: <PacksRoute />,
+        path: '/login',
+        element: <LoginRoute />,
       },
       {
-        path: '/inventory',
-        element: <HistoryRoute />,
+        path: '/create-account',
+        element: <CreateAccountRoute />,
       },
+    ],
+  },
+  {
+    element: <ProtectedRoute />,
+    children: [
       {
-        path: '/inventory/:orderId',
-        element: <InventoryAssignmentRoute />,
-      },
-      {
-        path: '/wallet',
-        element: <WalletRoute />,
+        element: <AuthenticatedLayout />,
+        children: [
+          {
+            path: '/packs',
+            element: <PacksRoute />,
+          },
+          {
+            path: '/inventory',
+            element: <HistoryRoute />,
+          },
+          {
+            path: '/inventory/:orderId',
+            element: <InventoryAssignmentRoute />,
+          },
+          {
+            path: '/wallet',
+            element: <WalletRoute />,
+          },
+        ],
       },
     ],
   },
   {
     path: '*',
-    element: <Navigate replace to="/packs" />,
+    element: <RootRedirect />,
   },
 ])

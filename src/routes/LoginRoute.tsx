@@ -2,20 +2,24 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import LoginIcon from '@mui/icons-material/Login'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { Button, Stack } from '@mui/material'
+import { Alert, Button, Stack } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { colors } from '../colors'
 import { AuthLayout } from '../features/auth/AuthLayout'
 import { AuthTextField } from '../features/auth/AuthTextField'
+import { useLoginMutation } from '../features/auth/hooks/useLoginMutation'
 import {
   loginDefaultValues,
   loginSchema,
   type LoginFormValues,
 } from '../features/auth/authSchemas'
+import { getApiErrorMessage } from '../lib/api/errors'
 
 function LoginRoute() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const loginMutation = useLoginMutation()
   const {
     register,
     handleSubmit,
@@ -25,8 +29,18 @@ function LoginRoute() {
     resolver: yupResolver(loginSchema),
   })
 
-  const onSubmit = async () => {
-    navigate('/packs')
+  const redirectTo =
+    location.state &&
+    typeof location.state === 'object' &&
+    'from' in location.state &&
+    typeof location.state.from === 'string'
+      ? location.state.from
+      : '/packs'
+
+  const onSubmit = async (values: LoginFormValues) => {
+    loginMutation.reset()
+    await loginMutation.mutateAsync(values)
+    navigate(redirectTo, { replace: true })
   }
 
   return (
@@ -56,11 +70,19 @@ function LoginRoute() {
             registration={register('password')}
             type="password"
           />
+          {loginMutation.isError ? (
+            <Alert severity="error" variant="outlined">
+              {getApiErrorMessage(
+                loginMutation.error,
+                'Login failed. Please check your credentials and try again.',
+              )}
+            </Alert>
+          ) : null}
         </Stack>
 
         <Stack spacing={2.5} sx={{ pt: 4 }}>
           <Button
-            disabled={isSubmitting}
+            disabled={isSubmitting || loginMutation.isPending}
             endIcon={<LoginIcon />}
             size="large"
             sx={{
