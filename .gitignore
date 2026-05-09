@@ -10,8 +10,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+stitch_kiosk_data_rapid_portal
 *.local
-
+.codex
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
