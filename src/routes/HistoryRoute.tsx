@@ -4,7 +4,7 @@ import { colors } from '../colors'
 
 function HistoryRoute() {
   useAuthenticatedHeader({
-    title: 'History',
+    title: 'Inventory',
   })
 
   return (
@@ -19,11 +19,11 @@ function HistoryRoute() {
     >
       <Stack spacing={1.25}>
         <Typography variant="h3" sx={{ color: colors.onSurface }}>
-          Purchase history is coming next
+          Inventory is coming next
         </Typography>
         <Typography sx={{ color: colors.onSurfaceVariant }}>
           This placeholder keeps the authenticated shell wired while the actual
-          ledger experience is still out of scope.
+          inventory experience is still out of scope.
         </Typography>
       </Stack>
     </Paper>

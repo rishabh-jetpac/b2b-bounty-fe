@@ -10,7 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-stitch_kiosk_data_rapid_portal
+dev_files
 *.local
 .codex
 # Editor directories and files

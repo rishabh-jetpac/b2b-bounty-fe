@@ -27,7 +27,7 @@ export const router = createBrowserRouter([
         element: <PacksRoute />,
       },
       {
-        path: '/history',
+        path: '/inventory',
         element: <HistoryRoute />,
       },
       {

@@ -14,7 +14,6 @@ import { colors } from '../../colors'
 import { BottomSheet } from './BottomSheet'
 import {
   formatBalance,
-  formatPackPrice,
   formatValidity,
   getPackPriceValue,
 } from './packFormatting'
@@ -106,7 +105,7 @@ export function PurchaseSheet({
                   lineHeight: 1.4,
                 }}
               >
-                {formatPackPrice(pack)}
+                {formatBalance(totalPrice, pack.price.currency)}
               </Typography>
             </Stack>
 

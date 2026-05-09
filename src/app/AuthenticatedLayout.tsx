@@ -1,5 +1,5 @@
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined'
-import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined'
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined'
 import {
   BottomNavigation,
@@ -140,11 +140,11 @@ export function AuthenticatedLayout() {
                 sx={bottomNavigationActionSx}
               />
               <BottomNavigationAction
-                label="History"
-                value="/history"
+                label="Inventory"
+                value="/inventory"
                 component={RouterLink}
-                icon={<HistoryOutlinedIcon />}
-                to="/history"
+                icon={<Inventory2OutlinedIcon />}
+                to="/inventory"
                 sx={bottomNavigationActionSx}
               />
               <BottomNavigationAction

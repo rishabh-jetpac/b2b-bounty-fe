@@ -17,6 +17,7 @@ export function PackCard({ onSelect, pack, selected }: PackCardProps) {
       elevation={0}
       sx={{
         overflow: 'hidden',
+        boxSizing: 'border-box',
         borderRadius: '8px',
         border: selected
           ? `2px solid ${colors.primaryContainer}`
@@ -50,7 +51,7 @@ export function PackCard({ onSelect, pack, selected }: PackCardProps) {
               variant="h3"
               sx={{
                 color: colors.onSurface,
-                fontSize: { xs: '1.25rem', sm: '1.35rem' },
+                fontSize: { xs: '1.12rem', sm: '1.2rem' },
                 lineHeight: 1.25,
               }}
             >
@@ -68,7 +69,7 @@ export function PackCard({ onSelect, pack, selected }: PackCardProps) {
               variant="h2"
               sx={{
                 color: selected ? colors.primaryContainer : colors.onSurface,
-                fontSize: { xs: '1.6rem', sm: '1.8rem' },
+                fontSize: { xs: '1.4rem', sm: '1.55rem' },
               }}
             >
               {formatPackPrice(pack)}
@@ -77,8 +78,8 @@ export function PackCard({ onSelect, pack, selected }: PackCardProps) {
 
           <Box
             sx={{
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
               borderRadius: '50%',
               display: 'grid',
               placeItems: 'center',
@@ -92,7 +93,7 @@ export function PackCard({ onSelect, pack, selected }: PackCardProps) {
               flexShrink: 0,
             }}
           >
-            <CheckRoundedIcon sx={{ fontSize: 18 }} />
+            <CheckRoundedIcon sx={{ fontSize: 14 }} />
           </Box>
         </Stack>
       </ButtonBase>
