@@ -23,3 +23,4 @@ dev_files
 *.njsproj
 *.sln
 *.sw?
+.vercel

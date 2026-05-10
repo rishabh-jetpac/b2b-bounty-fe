@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { useEffect } from 'react'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import { theme } from './theme'
 import { appQueryClient } from './queryClient'
 import { useAuthStore } from '../store/authStore'
@@ -22,6 +24,7 @@ export function AppProviders({ children }: AppProvidersProps) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {children}
+        <ToastContainer autoClose={4000} newestOnTop position="top-center" />
       </ThemeProvider>
     </QueryClientProvider>
   )

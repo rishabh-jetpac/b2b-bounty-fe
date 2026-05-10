@@ -5,6 +5,7 @@ import LoginIcon from '@mui/icons-material/Login'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { Alert, Button, Stack } from '@mui/material'
 import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router'
 import { colors } from '../colors'
 import { AuthLayout } from '../features/auth/AuthLayout'
@@ -38,7 +39,20 @@ function CreateAccountRoute() {
       password: values.password,
     })
 
-    navigate(response.data?.token ? '/packs' : '/login', { replace: true })
+    if (response.data?.token) {
+      navigate('/packs', { replace: true })
+      return
+    }
+
+    if (response.data?.message) {
+      toast.info(response.data.message, {
+        toastId: 'registration-pending-approval',
+      })
+      navigate('/login', { replace: true })
+      return
+    }
+
+    navigate('/login', { replace: true })
   }
 
   return (

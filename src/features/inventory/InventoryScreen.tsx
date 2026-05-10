@@ -369,7 +369,6 @@ function InventoryHistorySection({
   emptyTitle,
   items,
   onSelectItem,
-  query,
   readOnly,
   title,
 }: InventoryHistorySectionProps) {

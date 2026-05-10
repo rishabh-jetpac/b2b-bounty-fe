@@ -31,6 +31,7 @@ export type CreateSubadminRequest = {
 
 export type RegisterResponse = {
   data?: {
+    message?: string
     token?: string
   }
 }
