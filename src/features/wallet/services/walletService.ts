@@ -55,9 +55,29 @@ function normalizeWalletTransaction(
 }
 
 function getWalletTransactionTitle(
-  reason: string,
+  reason: string | Record<string, number>,
   type: WalletTransactionType,
 ): string {
+  if (typeof reason !== 'string') {
+    if ('topup' in reason) {
+      return 'Wallet top-up'
+    }
+
+    const purchases = Object.entries(reason)
+      .filter(([packName, quantity]) => packName.trim() && quantity > 0)
+      .map(([packName, quantity]) =>
+        quantity > 1 ? `${packName} x${quantity}` : packName,
+      )
+
+    if (purchases.length > 0) {
+      return purchases.join(', ')
+    }
+  }
+
+  if (typeof reason !== 'string') {
+    return type === 'credit' ? 'Wallet credit' : 'Wallet debit'
+  }
+
   const [prefix, details = ''] = reason.split(':', 2)
 
   if (prefix === 'purchase') {

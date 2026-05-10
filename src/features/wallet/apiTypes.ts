@@ -15,7 +15,7 @@ export type WalletTransactionApiItem = {
   org_id: string
   type: 'debit' | 'credit'
   amount_cents: number
-  reason: string
+  reason: string | Record<string, number>
   created_at: string
 }
 
