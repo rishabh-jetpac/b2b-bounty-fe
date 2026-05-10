@@ -132,11 +132,11 @@ export function PacksScreen() {
         quantity,
       })
 
-      await walletQuery.refetch()
       handleClosePurchaseSheet()
       setPurchaseSuccessMessage(
         `Purchased ${purchaseResult.quantity} x ${purchaseResult.packName} successfully.`,
       )
+      void walletQuery.refetch()
     } catch {
       // The mutation state is rendered inline in the purchase sheet.
     }

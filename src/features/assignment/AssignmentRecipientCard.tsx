@@ -50,7 +50,7 @@ export function AssignmentRecipientCard({
         boxShadow: '0 12px 28px rgba(0, 61, 155, 0.06)',
       }}
     >
-      <Stack spacing={2}>
+      <Stack spacing={1.1}>
         <TextField
           {...register(emailName)}
           error={Boolean(emailError)}
@@ -61,8 +61,8 @@ export function AssignmentRecipientCard({
           type="email"
           sx={{
             '& .MuiFormHelperText-root': {
-              minHeight: 22,
-              mt: 0.75,
+              minHeight: 18,
+              mt: 0.4,
             },
           }}
         />

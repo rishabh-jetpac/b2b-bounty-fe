@@ -35,6 +35,22 @@ export function formatInventoryRecency(item: Pick<InventoryItem, 'eventAt' | 'pu
   })
 }
 
+export function formatInventoryDate(
+  item: Pick<InventoryItem, 'eventAt' | 'purchasedAt'>,
+) {
+  const timestamp = getInventoryTimestamp(item)
+
+  if (!timestamp) {
+    return 'Date unavailable'
+  }
+
+  return timestamp.toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
 export function getInventoryTimestamp(
   item: Pick<InventoryItem, 'eventAt' | 'purchasedAt'>,
 ) {

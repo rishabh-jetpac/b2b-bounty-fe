@@ -1,7 +1,6 @@
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded'
-import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded'
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import {
@@ -27,7 +26,7 @@ import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
 import { PullToRefreshContainer } from '../../components/PullToRefreshContainer'
 import { colors } from '../../colors'
 import { getApiErrorMessage } from '../../lib/api/errors'
-import { formatInventoryRecency } from './inventoryFormatting'
+import { formatInventoryDate, formatInventoryRecency } from './inventoryFormatting'
 import {
   filterInventoryItems,
   filterInventoryPackGroups,
@@ -108,21 +107,11 @@ export function InventoryScreen() {
       >
         <Box>
           <Stack spacing={2.25}>
-            <Paper
-              elevation={0}
-              sx={{
-                overflow: 'hidden',
-                borderRadius: '20px',
-                border: `1px solid ${colors.outlineVariant}`,
-                backgroundColor: colors.surfaceContainerLowest,
-                boxShadow: `0 18px 36px ${alpha(colors.primary, 0.08)}`,
-              }}
-            >
+            <Stack spacing={1}>
               <Tabs
                 onChange={(_event, value: InventoryTab) => setActiveTab(value)}
                 sx={{
                   minHeight: 0,
-                  borderBottom: `1px solid ${colors.outlineVariant}`,
                   '& .MuiTabs-indicator': {
                     height: 3,
                     borderRadius: 999,
@@ -152,36 +141,39 @@ export function InventoryScreen() {
                 />
               </Tabs>
 
-              <Box sx={{ px: 2, py: 2 }}>
-                <TextField
-                  fullWidth
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder={searchPlaceholderByTab[activeTab]}
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchRoundedIcon />
-                        </InputAdornment>
-                      ),
-                      endAdornment: searchQuery ? (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="Clear inventory search"
-                            edge="end"
-                            onClick={() => setSearchQuery('')}
-                            sx={{ color: colors.outline }}
-                          >
-                            <CloseRoundedIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ) : undefined,
-                    },
-                  }}
-                  value={searchQuery}
-                />
-              </Box>
-            </Paper>
+              <TextField
+                fullWidth
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={searchPlaceholderByTab[activeTab]}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchRoundedIcon />
+                      </InputAdornment>
+                    ),
+                    endAdornment: searchQuery ? (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="Clear inventory search"
+                          edge="end"
+                          onClick={() => setSearchQuery('')}
+                          sx={{ color: colors.outline }}
+                        >
+                          <CloseRoundedIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ) : undefined,
+                  },
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: colors.surfaceContainerLowest,
+                  },
+                }}
+                value={searchQuery}
+              />
+            </Stack>
 
             {activeTab === 'unassigned' ? (
               <UnassignedSection
@@ -205,7 +197,7 @@ export function InventoryScreen() {
                 onSelectItem={setReassignmentItem}
                 query={searchQuery}
                 readOnly={false}
-                title="Assigned Inventory"
+                title="Assigned Packs"
               />
             ) : null}
 
@@ -275,7 +267,6 @@ function UnassignedSection({ groups, onAssign, query }: UnassignedSectionProps) 
   return (
     <Stack spacing={1.5}>
       <SectionHeader
-        description="Group stock by pack and start assignment from here."
         title="Unassigned Packs"
       />
 
@@ -285,90 +276,61 @@ function UnassignedSection({ groups, onAssign, query }: UnassignedSectionProps) 
             key={`${group.packId}:${group.packName}`}
             elevation={0}
             sx={{
-              borderRadius: '18px',
+              borderRadius: '8px',
               border: `1px solid ${colors.outlineVariant}`,
-              px: 2,
-              py: 2,
+              px: 1.75,
+              py: 1.35,
               backgroundColor: colors.surfaceContainerLowest,
-              boxShadow: `0 14px 28px ${alpha(colors.primary, 0.06)}`,
+              boxShadow: `0 10px 20px ${alpha(colors.primary, 0.05)}`,
             }}
           >
             <Stack
-              direction={{ xs: 'column', sm: 'row' }}
+              direction="row"
               spacing={1.5}
               sx={{
-                alignItems: { xs: 'stretch', sm: 'center' },
+                alignItems: 'center',
                 justifyContent: 'space-between',
               }}
             >
-              <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-                <Box
+              <Stack spacing={0.35} sx={{ minWidth: 0, flex: 1 }}>
+                <Typography
                   sx={{
-                    width: 56,
-                    height: 56,
-                    display: 'grid',
-                    placeItems: 'center',
-                    borderRadius: '14px',
-                    background: `linear-gradient(135deg, ${colors.primaryContainer} 0%, ${colors.primary} 100%)`,
-                    color: colors.onPrimary,
-                    flexShrink: 0,
+                    color: colors.onSurface,
+                    fontSize: { xs: '1.2rem', sm: '1.32rem' },
+                    fontWeight: 700,
+                    lineHeight: 1.2,
                   }}
                 >
-                  <Inventory2RoundedIcon sx={{ fontSize: 30 }} />
-                </Box>
-
-                <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-                  <Typography
-                    sx={{
-                      color: colors.onSurface,
-                      fontSize: '1.15rem',
-                      fontWeight: 700,
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    {group.packName}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: colors.onSurfaceVariant,
-                      fontSize: '0.92rem',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    Ready to assign
-                  </Typography>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                    <Box
-                      sx={{
-                        width: 5,
-                        height: 5,
-                        borderRadius: '50%',
-                        backgroundColor: colors.outlineVariant,
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        color: colors.primaryContainer,
-                        fontSize: '0.92rem',
-                        fontWeight: 700,
-                      }}
-                    >
-                      {`Qty: ${group.quantity}`}
-                    </Typography>
-                  </Stack>
-                </Stack>
+                  {group.packName}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: colors.primaryContainer,
+                    fontSize: '0.88rem',
+                    fontWeight: 700,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {`Available: ${group.quantity}`}
+                </Typography>
               </Stack>
 
               <Button
                 onClick={() => onAssign(group.packId)}
                 sx={{
-                  minWidth: { xs: '100%', sm: 132 },
-                  backgroundColor: colors.primaryContainer,
+                  minWidth: 0,
+                  px: 1.25,
+                  py: 0.2,
+                  color: colors.primaryContainer,
+                  fontSize: '0.92rem',
+                  fontWeight: 700,
+                  textTransform: 'none',
                   '&:hover': {
-                    backgroundColor: colors.primary,
+                    backgroundColor: 'transparent',
+                    color: colors.primary,
                   },
                 }}
-                variant="contained"
+                variant="text"
               >
                 Assign
               </Button>
@@ -495,7 +457,9 @@ function InventoryHistorySection({
                         lineHeight: 1.4,
                       }}
                     >
-                      {formatInventoryRecency(item)}
+                      {item.status === 'assigned'
+                        ? formatInventoryDate(item)
+                        : formatInventoryRecency(item)}
                     </Typography>
                   </Stack>
                 </Stack>
@@ -531,7 +495,7 @@ function InventoryHistorySection({
               elevation={0}
               sx={{
                 overflow: 'hidden',
-                borderRadius: '16px',
+                borderRadius: '8px',
                 border: `1px solid ${colors.outlineVariant}`,
                 backgroundColor: colors.surfaceContainerLowest,
               }}
@@ -570,7 +534,7 @@ function InventoryHistorySection({
 }
 
 type SectionHeaderProps = {
-  description: string
+  description?: string
   title: string
 }
 
@@ -581,12 +545,13 @@ function SectionHeader({ description, title }: SectionHeaderProps) {
         variant="h2"
         sx={{
           color: colors.onSurface,
-          fontSize: { xs: '1.55rem', sm: '1.7rem' },
+          fontSize: { xs: '1.25rem', sm: '1.35rem' },
           lineHeight: 1.2,
         }}
       >
         {title}
       </Typography>
+      {description &&
       <Typography
         sx={{
           color: colors.onSurfaceVariant,
@@ -595,7 +560,7 @@ function SectionHeader({ description, title }: SectionHeaderProps) {
         }}
       >
         {description}
-      </Typography>
+      </Typography>}
     </Stack>
   )
 }
@@ -687,7 +652,7 @@ const tabSx = {
 } as const
 
 const stateCardSx = {
-  borderRadius: '18px',
+  borderRadius: '8px',
   border: `1px solid ${colors.outlineVariant}`,
   px: 2.25,
   py: 2.5,

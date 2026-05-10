@@ -6,8 +6,8 @@ export function usePurchaseMutation() {
 
   return useMutation({
     mutationFn: purchasePack,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
         queryKey: ['wallet'],
       })
     },

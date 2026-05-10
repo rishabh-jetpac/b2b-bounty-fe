@@ -113,19 +113,10 @@ export function ReassignmentModal({
               variant="h2"
               sx={{
                 color: colors.onSurface,
-                fontSize: { xs: '1.9rem', sm: '2rem' },
+                fontSize: { xs: '1.5rem', sm: '1.5rem' },
               }}
             >
-              Confirm Reassignment
-            </Typography>
-            <Typography
-              sx={{
-                color: colors.onSurfaceVariant,
-                fontSize: '1rem',
-                lineHeight: 1.55,
-              }}
-            >
-              Reassign this pack to a different recipient.
+              Reassign Pack
             </Typography>
           </Stack>
 
@@ -133,7 +124,7 @@ export function ReassignmentModal({
             <Stack
               spacing={0.4}
               sx={{
-                px: 2,
+                px: 1,
                 py: 1.5,
                 borderRadius: '16px',
                 backgroundColor: colors.surfaceContainerLow,
@@ -166,7 +157,7 @@ export function ReassignmentModal({
                   overflowWrap: 'anywhere',
                 }}
               >
-                Current recipient: {item.recipientEmail ?? 'Unavailable'}
+                Current: {item.recipientEmail ?? 'Unavailable'}
               </Typography>
             </Stack>
           ) : null}

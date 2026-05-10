@@ -1,5 +1,4 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded'
 import {
   Alert,
@@ -206,35 +205,7 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
         <Paper
           elevation={0}
           sx={{
-            borderRadius: '16px',
-            px: 2,
-            py: 1.5,
-            backgroundColor: colors.primaryContainer,
-            color: colors.onPrimary,
-          }}
-        >
-          <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-            <CheckCircleRoundedIcon
-              sx={{
-                fontSize: 30,
-              }}
-            />
-            <Typography
-              sx={{
-                color: colors.onPrimary,
-                fontSize: '1rem',
-                lineHeight: 1.45,
-              }}
-            >
-              {`Ready to assign ${packSummary.packName} from active inventory.`}
-            </Typography>
-          </Stack>
-        </Paper>
-
-        <Paper
-          elevation={0}
-          sx={{
-            borderRadius: '20px',
+            borderRadius: '8px',
             border: `1px solid ${colors.outlineVariant}`,
             px: 2.5,
             py: 2.25,
@@ -278,9 +249,6 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
             <Typography variant="h2" sx={{ color: colors.onSurface }}>
               Assign Packages
             </Typography>
-            <Typography variant="overline" sx={{ color: colors.onSurfaceVariant }}>
-              Step 1 of 2
-            </Typography>
           </Stack>
 
           <Stack spacing={1.5}>
@@ -320,7 +288,7 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
               type="button"
               sx={{
                 minHeight: 56,
-                borderRadius: '16px',
+                borderRadius: '8px',
                 borderStyle: 'dashed',
                 color: colors.onSurfaceVariant,
                 backgroundColor: colors.surfaceContainerLowest,
@@ -359,6 +327,7 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
               disabled={assignNowDisabled}
               size="large"
               sx={{
+                borderRadius: '8px',
                 backgroundColor: colors.primaryContainer,
                 '&:hover': {
                   backgroundColor: colors.primary,
@@ -374,6 +343,7 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
               size="large"
               type="button"
               sx={{
+                borderRadius: '8px',
                 color: colors.primaryContainer,
                 borderColor: colors.primaryContainer,
                 backgroundColor: colors.surfaceContainerLowest,
