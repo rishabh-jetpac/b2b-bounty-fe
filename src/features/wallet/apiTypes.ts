@@ -22,3 +22,11 @@ export type WalletTransactionApiItem = {
 export type WalletTransactionsResponse = {
   data: WalletTransactionApiItem[]
 }
+
+export type WalletTopUpApiItem = {
+  message: string
+}
+
+export type WalletTopUpResponse = {
+  data: WalletTopUpApiItem
+}

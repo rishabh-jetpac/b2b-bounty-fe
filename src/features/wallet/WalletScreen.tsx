@@ -1,13 +1,25 @@
-import { Button, CircularProgress, Paper, Stack, Typography } from '@mui/material'
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import {
+  Alert,
+  Button,
+  Chip,
+  CircularProgress,
+  IconButton,
+  Paper,
+  Snackbar,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
 import { PullToRefreshContainer } from '../../components/PullToRefreshContainer'
 import { colors } from '../../colors'
 import { getApiErrorMessage } from '../../lib/api/errors'
+import { WalletTopUpDialog } from './WalletTopUpDialog'
 import { useWalletQuery } from './hooks/useWalletQuery'
 import { useWalletTransactionsQuery } from './hooks/useWalletTransactionsQuery'
-import type { WalletTransaction } from './types'
+import type { WalletTransaction, WalletTransactionType } from './types'
 import {
   formatWalletCurrency,
   formatWalletTransactionAmount,
@@ -19,6 +31,10 @@ import {
 export function WalletScreen() {
   const walletQuery = useWalletQuery()
   const walletTransactionsQuery = useWalletTransactionsQuery()
+  const [transactionFilter, setTransactionFilter] =
+    useState<TransactionHistoryFilter>('all')
+  const [isTopUpDialogOpen, setIsTopUpDialogOpen] = useState(false)
+  const [topUpSuccessMessage, setTopUpSuccessMessage] = useState<string | null>(null)
 
   useAuthenticatedHeader({
     title: 'Wallet',
@@ -63,109 +79,206 @@ export function WalletScreen() {
 
   const wallet = walletQuery.data
   const walletTransactions = walletTransactionsQuery.data ?? []
+  const filteredWalletTransactions =
+    transactionFilter === 'all'
+      ? walletTransactions
+      : walletTransactions.filter(
+          (transaction) => transaction.type === transactionFilter,
+        )
 
   return (
-    <PullToRefreshContainer onRefresh={handleRefresh}>
-      <Stack spacing={2.25}>
-        <Paper
-          elevation={0}
-          sx={{
-            position: 'relative',
-            overflow: 'hidden',
-            minHeight: { xs: 108, sm: 118 },
-            borderRadius: '8px',
-            px: 2.5,
-            py: 2,
-            background: `linear-gradient(135deg, ${colors.primaryContainer} 0%, ${colors.primary} 100%)`,
-            color: colors.onPrimary,
-            boxShadow: `0 16px 32px ${alpha(colors.primary, 0.2)}`,
-          }}
-        >
-          <Stack
-            spacing={0.9}
+    <>
+      <PullToRefreshContainer
+        isPullable={!isTopUpDialogOpen}
+        onRefresh={handleRefresh}
+      >
+        <Stack spacing={2.25}>
+          <Paper
+            elevation={0}
             sx={{
               position: 'relative',
-              zIndex: 1,
+              overflow: 'hidden',
+              minHeight: { xs: 108, sm: 118 },
+              borderRadius: '8px',
+              px: 2.5,
+              py: 2,
+              background: `linear-gradient(135deg, ${colors.primaryContainer} 0%, ${colors.primary} 100%)`,
+              color: colors.onPrimary,
+              boxShadow: `0 16px 32px ${alpha(colors.primary, 0.2)}`,
             }}
           >
-            <Typography
-              variant="overline"
+            <Stack
+              spacing={0.9}
               sx={{
-                color: alpha(colors.onPrimary, 0.84),
+                position: 'relative',
+                zIndex: 1,
               }}
             >
-              Total Balance
-            </Typography>
-            <Typography
-              variant="h2"
-              sx={{
-                color: colors.onPrimary,
-                fontSize: { xs: '1.95rem', sm: '2.15rem' },
-                lineHeight: 1.15,
-              }}
-            >
-              {formatWalletCurrency(wallet.balanceUsd)}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                color: alpha(colors.onPrimary, 0.84),
-              }}
-            >
-              {`Last updated ${formatWalletUpdatedAt(wallet.updatedAt)}`}
-            </Typography>
-          </Stack>
-        </Paper>
-
-        <Stack spacing={1.25}>
-          <Typography
-            variant="h3"
-            sx={{
-              color: colors.onSurface,
-              fontSize: { xs: '1rem', sm: '1.05rem' },
-            }}
-          >
-            Transaction History
-          </Typography>
-
-          {walletTransactionsQuery.isPending ? (
-            <LoadingHistoryState />
-          ) : walletTransactionsQuery.isError ? (
-            <StateCard
-              action={
-                <Button
-                  onClick={() => {
-                    void handleRefresh()
+              <Typography
+                variant="overline"
+                sx={{
+                  color: alpha(colors.onPrimary, 0.84),
+                }}
+              >
+                Total Balance
+              </Typography>
+              <Stack
+                direction="row"
+                spacing={1.5}
+                sx={{
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Typography
+                  variant="h2"
+                  sx={{
+                    color: colors.onPrimary,
+                    fontSize: { xs: '1.95rem', sm: '2.15rem' },
+                    lineHeight: 1.15,
                   }}
-                  sx={stateActionButtonSx}
-                  variant="contained"
                 >
-                  Retry
-                </Button>
-              }
-              description={getApiErrorMessage(
-                walletTransactionsQuery.error,
-                'We could not load your transaction history. Please try again.',
-              )}
-              title="We could not load your history"
-            />
-          ) : walletTransactions.length === 0 ? (
-            <StateCard
-              description="Transactions will appear here once this wallet has activity."
-              title="No transaction history yet"
-            />
-          ) : (
-            <Stack spacing={1.25}>
-              {walletTransactions.map((transaction) => (
-                <TransactionCard key={transaction.id} transaction={transaction} />
-              ))}
+                  {formatWalletCurrency(wallet.balanceUsd)}
+                </Typography>
+                <IconButton
+                  aria-label="Top up wallet"
+                  onClick={() => setIsTopUpDialogOpen(true)}
+                  sx={{
+                    width: 42,
+                    height: 42,
+                    flexShrink: 0,
+                    color: colors.onPrimary,
+                    backgroundColor: alpha(colors.onPrimary, 0.16),
+                    border: `1px solid ${alpha(colors.onPrimary, 0.22)}`,
+                    '&:hover': {
+                      backgroundColor: alpha(colors.onPrimary, 0.24),
+                    },
+                  }}
+                >
+                  <AddRoundedIcon />
+                </IconButton>
+              </Stack>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: alpha(colors.onPrimary, 0.84),
+                }}
+              >
+                {`Last updated ${formatWalletUpdatedAt(wallet.updatedAt)}`}
+              </Typography>
             </Stack>
-          )}
+          </Paper>
+
+          <Stack spacing={1.25}>
+            <Typography
+              variant="h3"
+              sx={{
+                color: colors.onSurface,
+                fontSize: { xs: '1rem', sm: '1.05rem' },
+              }}
+            >
+              Transaction History
+            </Typography>
+
+            {walletTransactionsQuery.isPending ? (
+              <LoadingHistoryState />
+            ) : walletTransactionsQuery.isError ? (
+              <StateCard
+                action={
+                  <Button
+                    onClick={() => {
+                      void handleRefresh()
+                    }}
+                    sx={stateActionButtonSx}
+                    variant="contained"
+                  >
+                    Retry
+                  </Button>
+                }
+                description={getApiErrorMessage(
+                  walletTransactionsQuery.error,
+                  'We could not load your transaction history. Please try again.',
+                )}
+                title="We could not load your history"
+              />
+            ) : walletTransactions.length === 0 ? (
+              <StateCard
+                description="Transactions will appear here once this wallet has activity."
+                title="No transaction history yet"
+              />
+            ) : (
+              <Stack spacing={1.25}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Chip
+                    clickable
+                    label="All"
+                    onClick={() => setTransactionFilter('all')}
+                    sx={getTransactionFilterChipSx(transactionFilter === 'all')}
+                  />
+                  <Chip
+                    clickable
+                    label="Credit"
+                    onClick={() => setTransactionFilter('credit')}
+                    sx={getTransactionFilterChipSx(transactionFilter === 'credit')}
+                  />
+                  <Chip
+                    clickable
+                    label="Debit"
+                    onClick={() => setTransactionFilter('debit')}
+                    sx={getTransactionFilterChipSx(transactionFilter === 'debit')}
+                  />
+                </Stack>
+
+                {filteredWalletTransactions.length === 0 ? (
+                  <StateCard title={getEmptyTransactionFilterTitle(transactionFilter)} />
+                ) : (
+                  <Stack spacing={1.25} sx={{ pb: '60vh' }}>
+                    {filteredWalletTransactions.map((transaction) => (
+                      <TransactionCard key={transaction.id} transaction={transaction} />
+                    ))}
+                  </Stack>
+                )}
+              </Stack>
+            )}
+          </Stack>
         </Stack>
-      </Stack>
-    </PullToRefreshContainer>
+      </PullToRefreshContainer>
+
+      <WalletTopUpDialog
+        onClose={() => setIsTopUpDialogOpen(false)}
+        onSuccess={(message) => {
+          setIsTopUpDialogOpen(false)
+          setTopUpSuccessMessage(message)
+        }}
+        open={isTopUpDialogOpen}
+      />
+
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        autoHideDuration={2500}
+        onClose={() => setTopUpSuccessMessage(null)}
+        open={topUpSuccessMessage !== null}
+      >
+        <Alert
+          onClose={() => setTopUpSuccessMessage(null)}
+          severity="success"
+          sx={{ width: '100%' }}
+          variant="filled"
+        >
+          {topUpSuccessMessage}
+        </Alert>
+      </Snackbar>
+    </>
   )
 }
+
+type TransactionHistoryFilter = 'all' | WalletTransactionType
 
 function LoadingState() {
   return (
@@ -286,7 +399,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
 
 type StateCardProps = {
   action?: ReactNode
-  description: string
+  description?: string
   title: string
 }
 
@@ -297,11 +410,43 @@ function StateCard({ action, description, title }: StateCardProps) {
         <Typography variant="h3" sx={{ color: colors.onSurface }}>
           {title}
         </Typography>
-        <Typography sx={{ color: colors.onSurfaceVariant }}>{description}</Typography>
+        {description?<Typography sx={{ color: colors.onSurfaceVariant }}>{description}</Typography>:null}
         {action ?? null}
       </Stack>
     </Paper>
   )
+}
+
+function getEmptyTransactionFilterTitle(filter: TransactionHistoryFilter) {
+  if (filter === 'credit') {
+    return 'No credit transactions'
+  }
+
+  if (filter === 'debit') {
+    return 'No debit transactions'
+  }
+
+  return 'No transaction history yet'
+}
+
+function getTransactionFilterChipSx(isActive: boolean) {
+  return {
+    height: 34,
+    borderRadius: 999,
+    border: `1px solid ${
+      isActive ? colors.primaryContainer : colors.outlineVariant
+    }`,
+    backgroundColor: isActive
+      ? colors.primaryFixed
+      : colors.surfaceContainerLowest,
+    color: isActive ? colors.primaryContainer : colors.onSurface,
+    fontFamily: '"Lexend", sans-serif',
+    fontWeight: isActive ? 700 : 500,
+    '& .MuiChip-label': {
+      px: 2,
+      py: 0.25,
+    },
+  } as const
 }
 
 const stateCardSx = {

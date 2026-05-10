@@ -18,3 +18,7 @@ export type WalletTransaction = {
   title: string
   createdAt: string
 }
+
+export type WalletTopUpRequest = {
+  amountUsd: number
+}

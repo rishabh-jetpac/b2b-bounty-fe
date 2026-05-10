@@ -2,6 +2,8 @@
 
 html {
   min-height: 100%;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 body {
@@ -10,4 +12,11 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }

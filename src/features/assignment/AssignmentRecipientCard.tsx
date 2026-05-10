@@ -43,14 +43,14 @@ export function AssignmentRecipientCard({
     <Paper
       elevation={0}
       sx={{
-        borderRadius: '16px',
+        borderRadius: '8px',
         border: `1px solid ${colors.outlineVariant}`,
         px: 2,
         py: 2.25,
         boxShadow: '0 12px 28px rgba(0, 61, 155, 0.06)',
       }}
     >
-      <Stack spacing={1.1}>
+      <Stack spacing={0.6}>
         <TextField
           {...register(emailName)}
           error={Boolean(emailError)}
@@ -100,7 +100,7 @@ export function AssignmentRecipientCard({
               sx={{
                 minWidth: 60,
                 px: 2.5,
-                py: 1.5,
+                py: 1,
                 borderLeft: `1px solid ${colors.outlineVariant}`,
                 borderRight: `1px solid ${colors.outlineVariant}`,
               }}
@@ -172,8 +172,8 @@ export function AssignmentRecipientCard({
 }
 
 const stepperActionSx = {
-  width: 48,
-  height: 48,
+  width: 40,
+  height: 40,
   borderRadius: 0,
   color: colors.onSurface,
   '&.Mui-disabled': {

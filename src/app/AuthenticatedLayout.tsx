@@ -103,7 +103,7 @@ export function AuthenticatedLayout() {
               edge="start"
               onClick={handleOpenDrawer}
               sx={{
-                color: colors.primaryContainer,
+                color: '#000000',
                 ml: -1,
               }}
             >
@@ -113,7 +113,7 @@ export function AuthenticatedLayout() {
               variant="h2"
               sx={{
                 flex: 1,
-                color: colors.primaryContainer,
+                color: '#000000',
                 fontSize: { xs: '1.6rem', sm: '1.75rem' },
                 lineHeight: 1.2,
                 minWidth: 0,

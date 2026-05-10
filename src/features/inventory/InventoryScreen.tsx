@@ -1,4 +1,3 @@
-import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded'
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
@@ -44,6 +43,24 @@ const searchPlaceholderByTab: Record<InventoryTab, string> = {
   assigned: 'Search by email or pack',
   failed: 'Search by email or pack',
 }
+
+const inventoryActionButtonSx = {
+  minWidth: 0,
+  minHeight: 28,
+  px: 1.6,
+  py: 0.05,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 999,
+  border: `1px solid ${colors.primary}`,
+  color: colors.primary,
+  fontSize: '0.92rem',
+  fontWeight: 500,
+  lineHeight: 1.2,
+  textTransform: 'none',
+  flexShrink: 0,
+} as const
 
 export function InventoryScreen() {
   const navigate = useNavigate()
@@ -318,15 +335,10 @@ function UnassignedSection({ groups, onAssign, query }: UnassignedSectionProps) 
               <Button
                 onClick={() => onAssign(group.packId)}
                 sx={{
-                  minWidth: 0,
-                  px: 1.25,
-                  py: 0.2,
-                  color: colors.primaryContainer,
-                  fontSize: '0.92rem',
-                  fontWeight: 700,
-                  textTransform: 'none',
+                  ...inventoryActionButtonSx,
                   '&:hover': {
-                    backgroundColor: 'transparent',
+                    border: `1px solid ${colors.primary}`,
+                    backgroundColor: alpha(colors.primary, 0.04),
                     color: colors.primary,
                   },
                 }}
@@ -368,13 +380,6 @@ function InventoryHistorySection({
   return (
     <Stack spacing={1.5}>
       <SectionHeader
-        description={
-          readOnly
-            ? 'These rows are read-only in the first release.'
-            : query
-              ? 'Tap a row to reassign the selected inventory item.'
-              : 'Tap any row to open reassignment.'
-        }
         title={title}
       />
 
@@ -484,7 +489,9 @@ function InventoryHistorySection({
                   Failed
                 </Box>
               ) : (
-                <ChevronRightRoundedIcon sx={{ color: colors.outline }} />
+                <Box component="span" sx={inventoryActionButtonSx}>
+                  Reassign
+                </Box>
               )}
             </Stack>
           )

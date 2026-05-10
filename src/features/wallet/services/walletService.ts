@@ -2,10 +2,16 @@ import { apiClient } from '../../../lib/api/client'
 import type {
   WalletApiItem,
   WalletResponse,
+  WalletTopUpResponse,
   WalletTransactionApiItem,
   WalletTransactionsResponse,
 } from '../apiTypes'
-import type { Wallet, WalletTransaction, WalletTransactionType } from '../types'
+import type {
+  Wallet,
+  WalletTopUpRequest,
+  WalletTransaction,
+  WalletTransactionType,
+} from '../types'
 
 export async function getWallet() {
   const response = await apiClient.get<WalletResponse>('/api/v1/wallet')
@@ -19,6 +25,16 @@ export async function getWalletTransactions() {
   )
 
   return response.data.data.map(normalizeWalletTransaction)
+}
+
+export async function topUpWallet(request: WalletTopUpRequest) {
+  const response = await apiClient.post<WalletTopUpResponse>('/api/v1/wallet/topup', {
+    amount_usd: request.amountUsd,
+  })
+
+  return {
+    message: response.data.data.message,
+  }
 }
 
 function normalizeWallet(wallet: WalletApiItem): Wallet {

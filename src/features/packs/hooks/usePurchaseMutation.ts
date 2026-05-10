@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { inventoryQueryKey } from '../../inventory/hooks/useInventoryQuery'
 import { purchasePack } from '../services/purchaseService'
 
 export function usePurchaseMutation() {
@@ -6,10 +7,15 @@ export function usePurchaseMutation() {
 
   return useMutation({
     mutationFn: purchasePack,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ['wallet'],
-      })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ['wallet'],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: inventoryQueryKey,
+        }),
+      ])
     },
   })
 }

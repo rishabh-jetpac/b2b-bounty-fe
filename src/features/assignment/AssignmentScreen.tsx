@@ -208,17 +208,17 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
             borderRadius: '8px',
             border: `1px solid ${colors.outlineVariant}`,
             px: 2.5,
-            py: 2.25,
+            py: 1.75,
             boxShadow: `0 14px 32px ${alpha(colors.primary, 0.06)}`,
           }}
         >
-          <Stack spacing={2}>
+          <Stack spacing={1.5}>
             <Typography
               variant="h2"
               sx={{
                 color: colors.onSurface,
-                fontSize: { xs: '1.85rem', sm: '2rem' },
-                lineHeight: 1.15,
+                fontSize: { xs: '1.12rem', sm: '1.2rem' },
+                lineHeight: 1.25,
               }}
             >
               {packSummary.packName}
@@ -228,7 +228,7 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
               sx={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                gap: 1.5,
+                gap: 1.25,
               }}
             >
               <SummaryTile label="Total Quantity" value={packSummary.quantity} />
@@ -246,8 +246,14 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
               justifyContent: 'space-between',
             }}
           >
-            <Typography variant="h2" sx={{ color: colors.onSurface }}>
-              Assign Packages
+            <Typography
+              variant="h3"
+              sx={{
+                color: colors.onSurface,
+                fontSize: { xs: '1rem', sm: '1.05rem' },
+              }}
+            >
+              Assign Packs
             </Typography>
           </Stack>
 
@@ -287,7 +293,7 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
               startIcon={<AddCircleOutlineRoundedIcon />}
               type="button"
               sx={{
-                minHeight: 56,
+                minHeight: 48,
                 borderRadius: '8px',
                 borderStyle: 'dashed',
                 color: colors.onSurfaceVariant,
@@ -327,6 +333,7 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
               disabled={assignNowDisabled}
               size="large"
               sx={{
+                minHeight: 48,
                 borderRadius: '8px',
                 backgroundColor: colors.primaryContainer,
                 '&:hover': {
@@ -343,6 +350,7 @@ function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) 
               size="large"
               type="button"
               sx={{
+                minHeight: 48,
                 borderRadius: '8px',
                 color: colors.primaryContainer,
                 borderColor: colors.primaryContainer,
@@ -389,11 +397,11 @@ function SummaryTile({ accent = false, label, value }: SummaryTileProps) {
         borderRadius: '14px',
         border: `1px solid ${alpha(colors.outlineVariant, 0.75)}`,
         px: 1.75,
-        py: 1.5,
+        py: 1.1,
         backgroundColor: colors.surfaceContainerLow,
       }}
     >
-      <Stack spacing={0.75}>
+      <Stack spacing={0.5}>
         <Typography
           variant="overline"
           sx={{
@@ -405,7 +413,7 @@ function SummaryTile({ accent = false, label, value }: SummaryTileProps) {
         <Typography
           sx={{
             color: accent ? colors.primaryContainer : colors.onSurface,
-            fontSize: '1.7rem',
+            fontSize: '1.5rem',
             fontWeight: 700,
             lineHeight: 1.1,
           }}

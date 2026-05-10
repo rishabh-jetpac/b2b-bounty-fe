@@ -1,16 +1,23 @@
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined'
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
+import Fuse from 'fuse.js'
 import {
   Alert,
   Box,
   Button,
   CircularProgress,
   Chip,
+  IconButton,
+  InputAdornment,
   Paper,
   Snackbar,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material'
-import { type ReactNode, useState } from 'react'
+import { alpha } from '@mui/material/styles'
+import { type ReactNode, useMemo, useState } from 'react'
 import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
 import { PullToRefreshContainer } from '../../components/PullToRefreshContainer'
 import { colors } from '../../colors'
@@ -29,18 +36,21 @@ import { PackCard } from './PackCard'
 import { PurchaseSheet } from './PurchaseSheet'
 import type { FilterSheetKey, Pack, PacksFilters } from './types'
 
+const EMPTY_PACKS: Pack[] = []
+
 export function PacksScreen() {
   const packsQuery = usePacksQuery()
   const walletQuery = useWalletQuery()
   const purchaseMutation = usePurchaseMutation()
   const [selectedPack, setSelectedPack] = useState<Pack | null>(null)
   const [quantity, setQuantity] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
   const [filters, setFilters] = useState<PacksFilters>({})
   const [activeSheet, setActiveSheet] = useState<FilterSheetKey | null>(null)
   const [purchaseSuccessMessage, setPurchaseSuccessMessage] = useState<string | null>(
     null,
   )
-  const packs = packsQuery.data ?? []
+  const packs = packsQuery.data ?? EMPTY_PACKS
   const balance = walletQuery.data?.balanceUsd ?? 0
 
   useAuthenticatedHeader({
@@ -73,26 +83,61 @@ export function PacksScreen() {
     },
   )
 
-  const filteredPacks = packs.filter((pack) => {
-    if (filters.country && pack.countryInfo?.display_name !== filters.country) {
-      return false
-    }
-    if (
-      filters.validityInDays !== undefined &&
-      pack.validityInDays !== filters.validityInDays
-    ) {
-      return false
-    }
-    if (filters.dataInGB !== undefined && pack.dataInGB !== filters.dataInGB) {
-      return false
-    }
-    return true
-  })
+  const filteredPacks = useMemo(
+    () =>
+      packs.filter((pack) => {
+        if (filters.country && pack.countryInfo?.display_name !== filters.country) {
+          return false
+        }
+        if (
+          filters.validityInDays !== undefined &&
+          pack.validityInDays !== filters.validityInDays
+        ) {
+          return false
+        }
+        if (filters.dataInGB !== undefined && pack.dataInGB !== filters.dataInGB) {
+          return false
+        }
+        return true
+      }),
+    [filters, packs],
+  )
+
+  const normalizedSearchQuery = searchQuery.trim()
+  const searchablePacks = useMemo(
+    () =>
+      filteredPacks.map((pack) => ({
+        country: pack.countryInfo?.display_name ?? '',
+        data: getPackDataSearchText(pack.dataInGB),
+        pack,
+        validity: getPackValiditySearchText(pack.validityInDays),
+      })),
+    [filteredPacks],
+  )
+  const packsSearch = useMemo(
+    () =>
+      new Fuse(searchablePacks, {
+        ignoreLocation: true,
+        keys: [
+          { name: 'pack.name', weight: 0.65 },
+          { name: 'country', weight: 0.15 },
+          { name: 'data', weight: 0.1 },
+          { name: 'validity', weight: 0.1 },
+        ],
+        threshold: 0.3,
+      }),
+    [searchablePacks],
+  )
+
+  const visiblePacks = normalizedSearchQuery
+    ? packsSearch.search(normalizedSearchQuery).map((result) => result.item.pack)
+    : filteredPacks
 
   const hasActiveFilters =
     filters.country !== undefined ||
     filters.validityInDays !== undefined ||
     filters.dataInGB !== undefined
+  const hasSearchQuery = normalizedSearchQuery.length > 0
   const packsErrorMessage = packsQuery.isError
     ? getApiErrorMessage(
         packsQuery.error,
@@ -104,9 +149,9 @@ export function PacksScreen() {
     await walletQuery.refetch()
   }
 
-  function handleSelectPack(pack: Pack) {
+  function handleSelectPack(pack: Pack, isSelected: boolean) {
     purchaseMutation.reset()
-    setSelectedPack(pack)
+    setSelectedPack(isSelected ? null : pack)
     setQuantity(1)
   }
 
@@ -152,6 +197,21 @@ export function PacksScreen() {
     }))
   }
 
+  function handleClearFilters() {
+    setFilters({})
+  }
+
+  function handleClearSearch() {
+    setSearchQuery('')
+  }
+
+  const emptyState = getEmptySearchState({
+    hasActiveFilters,
+    hasSearchQuery,
+    onClearFilters: handleClearFilters,
+    onClearSearch: handleClearSearch,
+  })
+
   return (
     <>
       <Box
@@ -170,61 +230,96 @@ export function PacksScreen() {
                 py: '4px',
               }}
             >
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <Chip
-                  clickable
-                  label={filters.country ?? 'Country'}
-                  onClick={() => setActiveSheet('country')}
-                  sx={getFilterChipSx(filters.country !== undefined)}
-                />
-                <Chip
-                  clickable
-                  label={
-                    filters.validityInDays !== undefined
-                      ? formatValidity(filters.validityInDays)
-                      : 'Validity'
-                  }
-                  onClick={() => setActiveSheet('validityInDays')}
-                  sx={getFilterChipSx(filters.validityInDays !== undefined)}
-                />
-                <Chip
-                  clickable
-                  label={
-                    filters.dataInGB !== undefined
-                      ? formatDataAmount(filters.dataInGB)
-                      : 'GB'
-                  }
-                  onClick={() => setActiveSheet('dataInGB')}
-                  sx={getFilterChipSx(filters.dataInGB !== undefined)}
-                />
-                {hasActiveFilters ? (
-                  <Button
-                    color="inherit"
-                    onClick={() => setFilters({})}
-                    size="small"
-                    startIcon={<HighlightOffOutlinedIcon />}
-                    sx={{
-                      color: colors.primaryContainer,
-                      ml: 'auto',
-                      px: 1.5,
-                      py: 0.25,
-                      minHeight: 30,
-                      border: `1px solid ${colors.outlineVariant}`,
-                      borderRadius: 999,
+              <Stack spacing={1}>
+                <TextField
+                  fullWidth
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search packs"
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchRoundedIcon />
+                        </InputAdornment>
+                      ),
+                      endAdornment: hasSearchQuery ? (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="Clear packs search"
+                            edge="end"
+                            onClick={() => setSearchQuery('')}
+                            sx={{ color: colors.outline }}
+                          >
+                            <CloseRoundedIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ) : undefined,
+                    },
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
                       backgroundColor: colors.surfaceContainerLowest,
-                    }}
-                    variant="outlined"
-                  >
-                    Clear
-                  </Button>
-                ) : null}
+                    },
+                  }}
+                  value={searchQuery}
+                />
+
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Chip
+                    clickable
+                    label={filters.country ?? 'Country'}
+                    onClick={() => setActiveSheet('country')}
+                    sx={getFilterChipSx(filters.country !== undefined)}
+                  />
+                  <Chip
+                    clickable
+                    label={
+                      filters.validityInDays !== undefined
+                        ? formatValidity(filters.validityInDays)
+                        : 'Validity'
+                    }
+                    onClick={() => setActiveSheet('validityInDays')}
+                    sx={getFilterChipSx(filters.validityInDays !== undefined)}
+                  />
+                  <Chip
+                    clickable
+                    label={
+                      filters.dataInGB !== undefined
+                        ? formatDataAmount(filters.dataInGB)
+                        : 'GB'
+                    }
+                    onClick={() => setActiveSheet('dataInGB')}
+                    sx={getFilterChipSx(filters.dataInGB !== undefined)}
+                  />
+                  {hasActiveFilters ? (
+                    <Button
+                      color="inherit"
+                      onClick={handleClearFilters}
+                      size="small"
+                      startIcon={<HighlightOffOutlinedIcon />}
+                      sx={{
+                        color: colors.primaryContainer,
+                        ml: 'auto',
+                        px: 1.5,
+                        py: 0.25,
+                        minHeight: 30,
+                        border: `1px solid ${colors.outlineVariant}`,
+                        borderRadius: 999,
+                        backgroundColor: colors.surfaceContainerLowest,
+                      }}
+                      variant="outlined"
+                    >
+                      Clear
+                    </Button>
+                  ) : null}
+                </Stack>
               </Stack>
             </Box>
           ) : null}
@@ -235,66 +330,66 @@ export function PacksScreen() {
           >
             <Box>
               {packsQuery.isPending ? (
-              <LoadingState />
-            ) : packsQuery.isError && packs.length === 0 ? (
-              <StateCard
-                action={
-                  <Button
-                    onClick={() => {
-                      void packsQuery.refetch()
-                    }}
-                    sx={stateActionButtonSx}
-                    variant="contained"
-                  >
-                    Retry
-                  </Button>
-                }
-                description={packsErrorMessage}
-                title="We could not load packs"
-              />
-            ) : packs.length === 0 ? (
-              <StateCard
-                description="The active catalog is empty right now. Please check again later."
-                title="No active packs available"
-              />
-            ) : filteredPacks.length > 0 ? (
-              <Stack spacing={2}>
-                {filteredPacks.map((pack) => (
-                  <PackCard
-                    key={pack.id}
-                    onSelect={() => handleSelectPack(pack)}
-                    pack={pack}
-                    selected={selectedPack?.id === pack.id}
-                  />
-                ))}
-              </Stack>
-            ) : (
-              <Paper
-                elevation={0}
-                sx={{
-                  ...stateCardSx,
-                }}
-              >
-                <Stack spacing={1.5} sx={{ alignItems: 'flex-start' }}>
-                  <Typography variant="h3" sx={{ color: colors.onSurface }}>
-                    No packs match these filters
-                  </Typography>
-                  <Typography sx={{ color: colors.onSurfaceVariant }}>
-                    Clear filters to bring the full catalog back into view.
-                  </Typography>
-                  <Button
-                    onClick={() => setFilters({})}
-                    sx={{
-                      color: colors.primaryContainer,
-                      alignSelf: 'center',
-                      px: 2.5,
-                    }}
-                  >
-                Clear filters
-              </Button>
-            </Stack>
-          </Paper>
-        )}
+                <LoadingState />
+              ) : packsQuery.isError && packs.length === 0 ? (
+                <StateCard
+                  action={
+                    <Button
+                      onClick={() => {
+                        void packsQuery.refetch()
+                      }}
+                      sx={stateActionButtonSx}
+                      variant="outlined"
+                    >
+                      Retry
+                    </Button>
+                  }
+                  description={packsErrorMessage}
+                  title="We could not load packs"
+                />
+              ) : packs.length === 0 ? (
+                <StateCard
+                  description="The active catalog is empty right now. Please check again later."
+                  title="No active packs available"
+                />
+              ) : visiblePacks.length > 0 ? (
+                <Stack spacing={2}>
+                  {visiblePacks.map((pack) => (
+                    <PackCard
+                      key={pack.id}
+                      onSelect={(isSelected) => handleSelectPack(pack, isSelected)}
+                      pack={pack}
+                      selected={selectedPack?.id === pack.id}
+                    />
+                  ))}
+                </Stack>
+              ) : (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    ...stateCardSx,
+                  }}
+                >
+                  <Stack spacing={1.5} sx={{ alignItems: 'flex-start' }}>
+                    <Typography variant="h3" sx={{ color: colors.onSurface }}>
+                      {emptyState.title}
+                    </Typography>
+                    <Typography sx={{ color: colors.onSurfaceVariant }}>
+                      {emptyState.description}
+                    </Typography>
+                    <Button
+                      onClick={emptyState.onClear}
+                      sx={{
+                        alignSelf: 'center',
+                        ...stateActionButtonSx,
+                      }}
+                      variant="outlined"
+                    >
+                      {emptyState.actionLabel}
+                    </Button>
+                  </Stack>
+                </Paper>
+              )}
             </Box>
           </PullToRefreshContainer>
         </Stack>
@@ -472,8 +567,65 @@ const stateCardSx = {
 } as const
 
 const stateActionButtonSx = {
-  backgroundColor: colors.primaryContainer,
+  borderColor: colors.primary,
+  color: colors.primary,
   '&:hover': {
-    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    backgroundColor: alpha(colors.primary, 0.04),
+    color: colors.primary,
   },
 } as const
+
+type EmptySearchStateArgs = {
+  hasActiveFilters: boolean
+  hasSearchQuery: boolean
+  onClearFilters: () => void
+  onClearSearch: () => void
+}
+
+function getEmptySearchState({
+  hasActiveFilters,
+  hasSearchQuery,
+  onClearFilters,
+  onClearSearch,
+}: EmptySearchStateArgs) {
+  if (hasActiveFilters && hasSearchQuery) {
+    return {
+      actionLabel: 'Clear all',
+      description: 'Clear the current search and filters to bring the full catalog back.',
+      onClear: () => {
+        onClearSearch()
+        onClearFilters()
+      },
+      title: 'No packs match this search and filters',
+    }
+  }
+
+  if (hasSearchQuery) {
+    return {
+      actionLabel: 'Clear search',
+      description: 'Try a different pack or country name.',
+      onClear: onClearSearch,
+      title: 'No packs match this search',
+    }
+  }
+
+  return {
+    actionLabel: 'Clear filters',
+    description: 'Clear filters to bring the full catalog back into view.',
+    onClear: onClearFilters,
+    title: 'No packs match these filters',
+  }
+}
+
+function getPackDataSearchText(dataInGB: number) {
+  if (dataInGB === -1) {
+    return 'Unlimited unlimited data unlimited gb'
+  }
+
+  return `${formatDataAmount(dataInGB)} ${dataInGB} GB ${dataInGB} gigabyte ${dataInGB} gigabytes data`
+}
+
+function getPackValiditySearchText(validityInDays: number) {
+  return `${formatValidity(validityInDays)} ${validityInDays} day ${validityInDays} days ${validityInDays}d validity`
+}

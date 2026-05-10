@@ -6,7 +6,7 @@ import { formatPackPrice, formatValidity } from './packFormatting'
 import type { Pack } from './types'
 
 type PackCardProps = {
-  onSelect: () => void
+  onSelect: (selected: boolean) => void
   pack: Pack
   selected: boolean
 }
@@ -29,7 +29,7 @@ export function PackCard({ onSelect, pack, selected }: PackCardProps) {
       }}
     >
       <ButtonBase
-        onClick={onSelect}
+        onClick={() => onSelect(selected)}
         sx={{
           width: '100%',
           textAlign: 'left',
