@@ -11,9 +11,9 @@ export default defineConfig({
       includeAssets: ['favicon-32x32.png', 'apple-touch-icon.png'],
       manifest: {
         id: '/',
-        name: 'B2B Bounty',
-        short_name: 'B2B Bounty',
-        description: 'Client-side React app for the B2B Bounty project.',
+        name: 'Jetpac B2B',
+        short_name: 'Jetpac B2B',
+        description: 'Client-side React app for Jetpac B2B.',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
