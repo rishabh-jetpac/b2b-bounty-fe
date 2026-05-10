@@ -14,7 +14,7 @@ export type WalletTransaction = {
   type: WalletTransactionType
   amountUsdCents: number
   amountUsd: number
-  reason: string
+  reason: string | Record<string, number>
   title: string
   createdAt: string
 }
