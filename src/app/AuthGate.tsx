@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { CircularProgress, Stack } from '@mui/material'
 import { Navigate, Outlet, useLocation } from 'react-router'
 import { colors } from '../colors'
@@ -66,4 +67,33 @@ export function ProtectedRoute() {
   }
 
   return <Outlet />
+}
+
+type AdminOnlyRouteProps = {
+  children?: ReactNode
+}
+
+export function AdminOnlyRoute({ children }: AdminOnlyRouteProps) {
+  const location = useLocation()
+  const hydrated = useAuthStore((state) => state.hydrated)
+  const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore(
+    (state) => Boolean(state.accessToken && state.user),
+  )
+
+  if (!hydrated) {
+    return <AuthGateLoader />
+  }
+
+  if (!isAuthenticated) {
+    const from = `${location.pathname}${location.search}${location.hash}`
+
+    return <Navigate replace state={{ from }} to="/login" />
+  }
+
+  if (user?.role !== 'admin') {
+    return <Navigate replace to="/packs" />
+  }
+
+  return children ?? <Outlet />
 }

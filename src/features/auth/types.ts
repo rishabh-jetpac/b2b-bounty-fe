@@ -24,6 +24,11 @@ export type RegisterRequest = {
   password: string
 }
 
+export type CreateSubadminRequest = {
+  email: string
+  password: string
+}
+
 export type RegisterResponse = {
   data?: {
     token?: string

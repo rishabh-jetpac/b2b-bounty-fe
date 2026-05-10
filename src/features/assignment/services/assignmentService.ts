@@ -1,18 +1,20 @@
+import { assignInventoryItemToRecipient } from '../../inventory/services/inventoryService'
 import type { AssignmentSubmitPayload } from '../types'
 
-const serviceDelayMs = 350
-
-function wait(delayMs: number) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, delayMs)
-  })
-}
-
 export async function submitAssignments(payload: AssignmentSubmitPayload) {
-  await wait(serviceDelayMs)
+  const requests = payload.assignments.flatMap((assignment) =>
+    Array.from({ length: assignment.quantity }, () =>
+      assignInventoryItemToRecipient(payload.packId, {
+        email: assignment.email,
+      }),
+    ),
+  )
+
+  await Promise.all(requests)
 
   return {
-    order_id: payload.order_id,
+    packId: payload.packId,
+    submittedCount: requests.length,
     success: true as const,
   }
 }

@@ -17,27 +17,33 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router'
 import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
 import { colors } from '../../colors'
+import { getApiErrorMessage } from '../../lib/api/errors'
+import { getInventoryPackAssignmentSummary } from '../inventory/inventorySelectors'
+import { useInventoryQuery } from '../inventory/hooks/useInventoryQuery'
 import { AssignmentRecipientCard } from './AssignmentRecipientCard'
 import {
   assignmentDefaultValues,
   createAssignmentSchema,
 } from './assignmentSchemas'
-import { useOrderQuery } from './hooks/useOrderQuery'
 import { useSubmitAssignmentsMutation } from './hooks/useSubmitAssignmentsMutation'
-import type { AssignmentFormValues, OrderResponse } from './types'
+import type { AssignmentFormValues, AssignmentPackSummary } from './types'
 
 export function AssignmentScreen() {
   const navigate = useNavigate()
-  const { orderId } = useParams()
+  const { packId } = useParams()
+  const inventoryQuery = useInventoryQuery()
 
   useAuthenticatedHeader({
     hideBottomNavigation: true,
     title: 'Inventory',
   })
 
-  const orderQuery = useOrderQuery(orderId)
+  const assignmentPack =
+    packId && inventoryQuery.data
+      ? getInventoryPackAssignmentSummary(inventoryQuery.data, packId)
+      : undefined
 
-  if (orderQuery.isLoading) {
+  if (inventoryQuery.isPending) {
     return (
       <Stack
         sx={{
@@ -51,7 +57,7 @@ export function AssignmentScreen() {
     )
   }
 
-  if (!orderId || orderQuery.isError || !orderQuery.data) {
+  if (!packId || inventoryQuery.isError || !assignmentPack) {
     return (
       <Paper
         elevation={0}
@@ -64,14 +70,18 @@ export function AssignmentScreen() {
       >
         <Stack spacing={2}>
           <Typography variant="h3" sx={{ color: colors.onSurface }}>
-            This purchase could not be loaded
+            This inventory pack could not be loaded
           </Typography>
           <Typography sx={{ color: colors.onSurfaceVariant }}>
-            Mock orders only exist in memory for the current session, so refreshing
-            or opening the link directly will not restore the purchase.
+            {inventoryQuery.isError
+              ? getApiErrorMessage(
+                  inventoryQuery.error,
+                  'We could not load the selected pack from live inventory.',
+                )
+              : 'The selected pack is no longer available in unassigned inventory.'}
           </Typography>
           <Button
-            onClick={() => navigate('/packs')}
+            onClick={() => navigate('/inventory')}
             sx={{
               alignSelf: 'flex-start',
               backgroundColor: colors.primaryContainer,
@@ -88,14 +98,14 @@ export function AssignmentScreen() {
     )
   }
 
-  return <AssignmentScreenContent order={orderQuery.data} />
+  return <AssignmentScreenContent packSummary={assignmentPack} />
 }
 
 type AssignmentScreenContentProps = {
-  order: OrderResponse
+  packSummary: AssignmentPackSummary
 }
 
-function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
+function AssignmentScreenContent({ packSummary }: AssignmentScreenContentProps) {
   const navigate = useNavigate()
   const submitAssignmentsMutation = useSubmitAssignmentsMutation()
   const [successOpen, setSuccessOpen] = useState(false)
@@ -109,7 +119,7 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
   } = useForm<AssignmentFormValues>({
     defaultValues: assignmentDefaultValues,
     mode: 'onChange',
-    resolver: yupResolver(createAssignmentSchema(order.quantity)),
+    resolver: yupResolver(createAssignmentSchema(packSummary.quantity)),
   })
 
   const { append, fields, remove } = useFieldArray({
@@ -125,9 +135,9 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
     (sum, assignment) => sum + (assignment.quantity || 0),
     0,
   )
-  const remaining = Math.max(order.quantity - totalAssigned, 0)
+  const remaining = Math.max(packSummary.quantity - totalAssigned, 0)
   const hasRows = fields.length > 0
-  const exceedsTotal = totalAssigned > order.quantity
+  const exceedsTotal = totalAssigned > packSummary.quantity
   const assignNowDisabled =
     !hasRows || exceedsTotal || !isValid || submitAssignmentsMutation.isPending
 
@@ -147,7 +157,7 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
 
   const onSubmit = handleSubmit(async (values) => {
     await submitAssignmentsMutation.mutateAsync({
-      order_id: order.order_id,
+      packId: packSummary.packId,
       assignments: values.assignments.map((assignment) => ({
         email: assignment.email.trim(),
         quantity: assignment.quantity,
@@ -166,7 +176,7 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
 
       return sum + assignment.quantity
     }, 0)
-    const maxQuantity = Math.max(order.quantity - otherRowsQuantity, 1)
+    const maxQuantity = Math.max(packSummary.quantity - otherRowsQuantity, 1)
     const nextQuantity =
       direction === 'increase'
         ? Math.min(currentQuantity + 1, maxQuantity)
@@ -216,7 +226,7 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
                 lineHeight: 1.45,
               }}
             >
-              {`Purchase successful - ${order.pack.displayName} (x${order.quantity})`}
+              {`Ready to assign ${packSummary.packName} from active inventory.`}
             </Typography>
           </Stack>
         </Paper>
@@ -240,7 +250,7 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
                 lineHeight: 1.15,
               }}
             >
-              {order.pack.displayName}
+              {packSummary.packName}
             </Typography>
 
             <Box
@@ -250,12 +260,8 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
                 gap: 1.5,
               }}
             >
-              <SummaryTile label="Total Quantity" value={order.quantity} />
-              <SummaryTile
-                accent
-                label="Remaining"
-                value={remaining}
-              />
+              <SummaryTile label="Total Quantity" value={packSummary.quantity} />
+              <SummaryTile accent label="Remaining" value={remaining} />
             </Box>
           </Stack>
         </Paper>
@@ -289,7 +295,7 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
                 },
                 0,
               )
-              const maxQuantity = Math.max(order.quantity - otherRowsQuantity, 1)
+              const maxQuantity = Math.max(packSummary.quantity - otherRowsQuantity, 1)
 
               return (
                 <AssignmentRecipientCard
@@ -340,7 +346,10 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
 
             {submitAssignmentsMutation.isError ? (
               <Alert severity="error" variant="outlined">
-                Something went wrong while assigning the order. Please try again.
+                {getApiErrorMessage(
+                  submitAssignmentsMutation.error,
+                  'We could not assign this inventory. Please try again.',
+                )}
               </Alert>
             ) : null}
           </Stack>
@@ -361,7 +370,7 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
               {submitAssignmentsMutation.isPending ? 'Assigning...' : 'Assign now'}
             </Button>
             <Button
-              onClick={() => navigate('/packs')}
+              onClick={() => navigate('/inventory')}
               size="large"
               type="button"
               sx={{
@@ -389,7 +398,7 @@ function AssignmentScreenContent({ order }: AssignmentScreenContentProps) {
         open={successOpen}
       >
         <Alert severity="success" sx={{ width: '100%' }} variant="filled">
-          Assignment submitted successfully.
+          Inventory assigned successfully.
         </Alert>
       </Snackbar>
     </>

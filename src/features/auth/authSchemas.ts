@@ -8,6 +8,15 @@ const emailField = yup
 
 const passwordField = yup.string().required('Password is required.')
 
+const accountCredentialsSchemaFields = {
+  email: emailField,
+  password: passwordField,
+  confirmPassword: yup
+    .string()
+    .required('Confirm your password.')
+    .oneOf([yup.ref('password')], 'Passwords must match.'),
+}
+
 export const loginSchema = yup
   .object({
     email: emailField,
@@ -21,17 +30,17 @@ export const createAccountSchema = yup
       .string()
       .trim()
       .required('Organization name is required.'),
-    email: emailField,
-    password: passwordField,
-    confirmPassword: yup
-      .string()
-      .required('Confirm your password.')
-      .oneOf([yup.ref('password')], 'Passwords must match.'),
+    ...accountCredentialsSchemaFields,
   })
+  .required()
+
+export const createSubadminSchema = yup
+  .object(accountCredentialsSchemaFields)
   .required()
 
 export type LoginFormValues = yup.InferType<typeof loginSchema>
 export type CreateAccountFormValues = yup.InferType<typeof createAccountSchema>
+export type CreateSubadminFormValues = yup.InferType<typeof createSubadminSchema>
 
 export const loginDefaultValues: LoginFormValues = {
   email: '',
@@ -45,3 +54,8 @@ export const createAccountDefaultValues: CreateAccountFormValues = {
   confirmPassword: '',
 }
 
+export const createSubadminDefaultValues: CreateSubadminFormValues = {
+  email: '',
+  password: '',
+  confirmPassword: '',
+}

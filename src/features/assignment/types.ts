@@ -1,11 +1,7 @@
-export type OrderResponse = {
-  order_id: string
-  pack: {
-    catalog_id: string
-    displayName: string
-  }
+export type AssignmentPackSummary = {
+  packId: string
+  packName: string
   quantity: number
-  timestamp: string
 }
 
 export type AssignmentRecipient = {
@@ -14,7 +10,7 @@ export type AssignmentRecipient = {
 }
 
 export type AssignmentSubmitPayload = {
-  order_id: string
+  packId: string
   assignments: AssignmentRecipient[]
 }
 

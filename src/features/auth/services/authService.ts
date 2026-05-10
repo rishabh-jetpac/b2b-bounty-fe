@@ -1,5 +1,6 @@
 import { apiClient } from '../../../lib/api/client'
 import type {
+  CreateSubadminRequest,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
@@ -14,4 +15,8 @@ export async function login(request: LoginRequest) {
 export async function register(request: RegisterRequest) {
   const response = await apiClient.post<RegisterResponse>('/auth/register', request)
   return response.data
+}
+
+export async function createSubadmin(request: CreateSubadminRequest) {
+  await apiClient.post('/api/v1/auth/sub-admins', request)
 }

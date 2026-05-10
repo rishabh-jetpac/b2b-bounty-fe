@@ -3,6 +3,7 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
+import PersonAddAlt1OutlinedIcon from '@mui/icons-material/PersonAddAlt1Outlined'
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined'
 import {
   BottomNavigation,
@@ -57,7 +58,13 @@ export function AuthenticatedLayout() {
     navigate('/login', { replace: true })
   }
 
+  function handleCreateSubadmin() {
+    handleCloseDrawer()
+    navigate('/create-subadmin')
+  }
+
   const roleLabel = formatRoleLabel(user?.role)
+  const isAdmin = user?.role === 'admin'
 
   return (
     <Box
@@ -290,23 +297,46 @@ export function AuthenticatedLayout() {
 
           <Box sx={{ flex: 1 }} />
 
-          <Button
-            fullWidth
-            onClick={handleLogout}
-            startIcon={<LogoutRoundedIcon />}
-            sx={{
-              minHeight: 48,
-              borderRadius: '14px',
-              backgroundColor: colors.primaryContainer,
-              color: colors.onPrimary,
-              '&:hover': {
-                backgroundColor: colors.primary,
-              },
-            }}
-            variant="contained"
-          >
-            Log out
-          </Button>
+          <Stack spacing={1.5}>
+            {isAdmin ? (
+              <Button
+                fullWidth
+                onClick={handleCreateSubadmin}
+                startIcon={<PersonAddAlt1OutlinedIcon />}
+                sx={{
+                  minHeight: 48,
+                  borderRadius: '14px',
+                  borderColor: colors.outlineVariant,
+                  color: colors.primaryContainer,
+                  '&:hover': {
+                    borderColor: colors.primaryContainer,
+                    backgroundColor: colors.surfaceContainerLow,
+                  },
+                }}
+                variant="outlined"
+              >
+                Create Subadmin User
+              </Button>
+            ) : null}
+
+            <Button
+              fullWidth
+              onClick={handleLogout}
+              startIcon={<LogoutRoundedIcon />}
+              sx={{
+                minHeight: 48,
+                borderRadius: '14px',
+                backgroundColor: colors.primaryContainer,
+                color: colors.onPrimary,
+                '&:hover': {
+                  backgroundColor: colors.primary,
+                },
+              }}
+              variant="contained"
+            >
+              Log out
+            </Button>
+          </Stack>
         </Stack>
       </Drawer>
 

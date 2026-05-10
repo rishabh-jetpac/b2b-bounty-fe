@@ -1,7 +1,13 @@
 import { createBrowserRouter } from 'react-router'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
-import { GuestOnlyRoute, ProtectedRoute, RootRedirect } from './AuthGate'
+import {
+  AdminOnlyRoute,
+  GuestOnlyRoute,
+  ProtectedRoute,
+  RootRedirect,
+} from './AuthGate'
 import CreateAccountRoute from '../routes/CreateAccountRoute'
+import CreateSubadminRoute from '../routes/CreateSubadminRoute'
 import HistoryRoute from '../routes/HistoryRoute'
 import InventoryAssignmentRoute from '../routes/InventoryAssignmentRoute'
 import LoginRoute from '../routes/LoginRoute'
@@ -41,12 +47,20 @@ export const router = createBrowserRouter([
             element: <HistoryRoute />,
           },
           {
-            path: '/inventory/:orderId',
+            path: '/inventory/assign/:packId',
             element: <InventoryAssignmentRoute />,
           },
           {
             path: '/wallet',
             element: <WalletRoute />,
+          },
+          {
+            path: '/create-subadmin',
+            element: (
+              <AdminOnlyRoute>
+                <CreateSubadminRoute />
+              </AdminOnlyRoute>
+            ),
           },
         ],
       },

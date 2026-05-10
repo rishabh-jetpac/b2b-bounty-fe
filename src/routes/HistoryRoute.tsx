@@ -1,33 +1,7 @@
-import { Paper, Stack, Typography } from '@mui/material'
-import { useAuthenticatedHeader } from '../app/useAuthenticatedHeader'
-import { colors } from '../colors'
+import { InventoryScreen } from '../features/inventory/InventoryScreen'
 
 function HistoryRoute() {
-  useAuthenticatedHeader({
-    title: 'Inventory',
-  })
-
-  return (
-    <Paper
-      elevation={0}
-      sx={{
-        borderRadius: '8px',
-        border: `1px solid ${colors.outlineVariant}`,
-        px: 2.5,
-        py: 3,
-      }}
-    >
-      <Stack spacing={1.25}>
-        <Typography variant="h3" sx={{ color: colors.onSurface }}>
-          Inventory is coming next
-        </Typography>
-        <Typography sx={{ color: colors.onSurfaceVariant }}>
-          This placeholder keeps the authenticated shell wired while the actual
-          inventory experience is still out of scope.
-        </Typography>
-      </Stack>
-    </Paper>
-  )
+  return <InventoryScreen />
 }
 
 export default HistoryRoute
