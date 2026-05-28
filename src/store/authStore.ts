@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { appQueryClient } from '../app/queryClient'
-import { decodeAuthToken } from '../features/auth/authToken'
+import { decodeAuthToken } from '../features/auth/utils/authToken'
 import type { AuthUser } from '../features/auth/types'
 
 const accessTokenStorageKey = 'jetpac.accessToken'

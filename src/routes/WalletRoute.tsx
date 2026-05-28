@@ -1,4 +1,4 @@
-import { WalletScreen } from '../features/wallet/WalletScreen'
+import { WalletScreen } from '../features/wallet/screens/WalletScreen'
 
 function WalletRoute() {
   return <WalletScreen />

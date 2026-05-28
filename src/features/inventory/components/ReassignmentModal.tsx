@@ -15,10 +15,10 @@ import { alpha } from '@mui/material/styles'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
-import { colors } from '../../colors'
-import { getApiErrorMessage } from '../../lib/api/errors'
-import { useReassignInventoryMutation } from './hooks/useReassignInventoryMutation'
-import type { ReassignmentFormValues, InventoryItem } from './types'
+import { colors } from '../../../colors'
+import { getApiErrorMessage } from '../../../lib/api/errors'
+import { useReassignInventoryMutation } from '../hooks/useReassignInventoryMutation'
+import type { ReassignmentFormValues, InventoryItem } from '../types'
 
 const reassignmentSchema = yup
   .object({

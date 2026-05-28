@@ -10,8 +10,8 @@ import {
   Typography,
 } from '@mui/material'
 import type { FieldError, UseFormRegister } from 'react-hook-form'
-import { colors } from '../../colors'
-import type { AssignmentFormValues } from './types'
+import { colors } from '../../../colors'
+import type { AssignmentFormValues } from '../types'
 
 type AssignmentRecipientCardProps = {
   emailError?: FieldError

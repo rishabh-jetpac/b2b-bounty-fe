@@ -14,9 +14,9 @@ import { alpha } from '@mui/material/styles'
 import { useEffect } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import * as yup from 'yup'
-import { colors } from '../../colors'
-import { getApiErrorMessage } from '../../lib/api/errors'
-import { useWalletTopUpMutation } from './hooks/useWalletTopUpMutation'
+import { colors } from '../../../colors'
+import { getApiErrorMessage } from '../../../lib/api/errors'
+import { useWalletTopUpMutation } from '../hooks/useWalletTopUpMutation'
 
 const walletTopUpSchema = yup
   .object({

@@ -1,5 +1,5 @@
 import * as yup from 'yup'
-import type { AssignmentFormValues } from './types'
+import type { AssignmentFormValues } from '../types'
 
 const recipientSchema = yup
   .object({

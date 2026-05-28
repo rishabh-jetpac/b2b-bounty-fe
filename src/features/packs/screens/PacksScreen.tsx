@@ -18,23 +18,23 @@ import {
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { type ReactNode, useMemo, useState } from 'react'
-import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
-import { PullToRefreshContainer } from '../../components/PullToRefreshContainer'
-import { colors } from '../../colors'
-import { getApiErrorMessage } from '../../lib/api/errors'
-import { useWalletQuery } from '../wallet/hooks/useWalletQuery'
-import { FilterSheet } from './FilterSheet'
-import { usePacksQuery } from './hooks/usePacksQuery'
-import { usePurchaseMutation } from './hooks/usePurchaseMutation'
+import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
+import { PullToRefreshContainer } from '../../../components/PullToRefreshContainer'
+import { colors } from '../../../colors'
+import { getApiErrorMessage } from '../../../lib/api/errors'
+import { useWalletQuery } from '../../wallet/hooks/useWalletQuery'
+import { FilterSheet } from '../components/FilterSheet'
+import { usePacksQuery } from '../hooks/usePacksQuery'
+import { usePurchaseMutation } from '../hooks/usePurchaseMutation'
 import {
   formatBalance,
   formatDataAmount,
   formatValidity,
   getPackPriceValue,
-} from './packFormatting'
-import { PackCard } from './PackCard'
-import { PurchaseSheet } from './PurchaseSheet'
-import type { FilterSheetKey, Pack, PacksFilters } from './types'
+} from '../utils/packFormatting'
+import { PackCard } from '../components/PackCard'
+import { PurchaseSheet } from '../components/PurchaseSheet'
+import type { FilterSheetKey, Pack, PacksFilters } from '../types'
 
 const EMPTY_PACKS: Pack[] = []
 

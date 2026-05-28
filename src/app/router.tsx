@@ -12,6 +12,7 @@ import HistoryRoute from '../routes/HistoryRoute'
 import InventoryAssignmentRoute from '../routes/InventoryAssignmentRoute'
 import LoginRoute from '../routes/LoginRoute'
 import PacksRoute from '../routes/PacksRoute'
+import ProfileRoute from '../routes/ProfileRoute'
 import WalletRoute from '../routes/WalletRoute'
 
 export const router = createBrowserRouter([
@@ -53,6 +54,10 @@ export const router = createBrowserRouter([
           {
             path: '/wallet',
             element: <WalletRoute />,
+          },
+          {
+            path: '/profile',
+            element: <ProfileRoute />,
           },
           {
             path: '/create-subadmin',

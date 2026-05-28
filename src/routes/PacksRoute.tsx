@@ -1,4 +1,4 @@
-import { PacksScreen } from '../features/packs/PacksScreen'
+import { PacksScreen } from '../features/packs/screens/PacksScreen'
 
 function PacksRoute() {
   return <PacksScreen />

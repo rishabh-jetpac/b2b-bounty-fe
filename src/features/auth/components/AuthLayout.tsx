@@ -2,8 +2,8 @@ import type { ReactNode } from 'react'
 import { alpha } from '@mui/material/styles'
 import { Box, Container, Divider, Link as MuiLink, Paper, Stack, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router'
-import { colors } from '../../colors'
-import jetpacLogo from '../../assets/images/jetpac_new_logo.png'
+import { colors } from '../../../colors'
+import jetpacLogo from '../../../assets/images/jetpac_new_logo.png'
 
 interface AuthLayoutProps {
   children: ReactNode

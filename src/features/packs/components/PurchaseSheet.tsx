@@ -10,14 +10,14 @@ import {
   Typography,
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import { colors } from '../../colors'
+import { colors } from '../../../colors'
 import { BottomSheet } from './BottomSheet'
 import {
   formatBalance,
   formatValidity,
   getPackPriceValue,
-} from './packFormatting'
-import type { Pack } from './types'
+} from '../utils/packFormatting'
+import type { Pack } from '../types'
 
 type PurchaseSheetProps = {
   balance: number

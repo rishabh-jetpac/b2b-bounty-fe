@@ -4,7 +4,7 @@ import type {
   InventoryCounts,
   InventoryItem,
   InventoryPackGroup,
-} from './types'
+} from '../types'
 
 export function getInventoryCounts(items: InventoryItem[]): InventoryCounts {
   const groupedUnassigned = groupInventoryByPack(

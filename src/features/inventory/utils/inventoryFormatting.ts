@@ -1,4 +1,4 @@
-import type { InventoryItem } from './types'
+import type { InventoryItem } from '../types'
 
 const relativeTimeFormatter = new Intl.RelativeTimeFormat(undefined, {
   numeric: 'auto',

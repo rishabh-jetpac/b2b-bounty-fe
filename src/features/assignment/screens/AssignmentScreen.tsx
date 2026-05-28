@@ -14,18 +14,18 @@ import { alpha } from '@mui/material/styles'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router'
-import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
-import { colors } from '../../colors'
-import { getApiErrorMessage } from '../../lib/api/errors'
-import { getInventoryPackAssignmentSummary } from '../inventory/inventorySelectors'
-import { useInventoryQuery } from '../inventory/hooks/useInventoryQuery'
-import { AssignmentRecipientCard } from './AssignmentRecipientCard'
+import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
+import { colors } from '../../../colors'
+import { getApiErrorMessage } from '../../../lib/api/errors'
+import { useInventoryQuery } from '../../inventory/hooks/useInventoryQuery'
+import { getInventoryPackAssignmentSummary } from '../../inventory/utils/inventorySelectors'
+import { AssignmentRecipientCard } from '../components/AssignmentRecipientCard'
 import {
   assignmentDefaultValues,
   createAssignmentSchema,
-} from './assignmentSchemas'
-import { useSubmitAssignmentsMutation } from './hooks/useSubmitAssignmentsMutation'
-import type { AssignmentFormValues, AssignmentPackSummary } from './types'
+} from '../utils/assignmentSchemas'
+import { useSubmitAssignmentsMutation } from '../hooks/useSubmitAssignmentsMutation'
+import type { AssignmentFormValues, AssignmentPackSummary } from '../types'
 
 export function AssignmentScreen() {
   const navigate = useNavigate()

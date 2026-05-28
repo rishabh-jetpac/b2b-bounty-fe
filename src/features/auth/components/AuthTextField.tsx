@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material'
 import type { UseFormRegisterReturn } from 'react-hook-form'
-import { colors } from '../../colors'
+import { colors } from '../../../colors'
 
 interface AuthTextFieldProps {
   autoComplete?: string

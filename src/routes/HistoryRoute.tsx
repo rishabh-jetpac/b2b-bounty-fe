@@ -1,4 +1,4 @@
-import { InventoryScreen } from '../features/inventory/InventoryScreen'
+import { InventoryScreen } from '../features/inventory/screens/InventoryScreen'
 
 function HistoryRoute() {
   return <InventoryScreen />

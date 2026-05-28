@@ -1,4 +1,4 @@
-import { AssignmentScreen } from '../features/assignment/AssignmentScreen'
+import { AssignmentScreen } from '../features/assignment/screens/AssignmentScreen'
 
 function InventoryAssignmentRoute() {
   return <AssignmentScreen />

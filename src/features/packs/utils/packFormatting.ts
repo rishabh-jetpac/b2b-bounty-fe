@@ -1,4 +1,4 @@
-import type { Pack } from './types'
+import type { Pack } from '../types'
 
 export function formatBalance(amount: number, currency = 'USD') {
   return new Intl.NumberFormat('en-US', {

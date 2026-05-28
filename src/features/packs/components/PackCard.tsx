@@ -1,9 +1,9 @@
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded'
 import { Box, ButtonBase, Paper, Stack, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import { colors } from '../../colors'
-import { formatPackPrice, formatValidity } from './packFormatting'
-import type { Pack } from './types'
+import { colors } from '../../../colors'
+import { formatPackPrice, formatValidity } from '../utils/packFormatting'
+import type { Pack } from '../types'
 
 type PackCardProps = {
   onSelect: (selected: boolean) => void

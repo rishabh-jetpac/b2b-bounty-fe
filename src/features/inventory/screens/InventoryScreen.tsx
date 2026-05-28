@@ -21,11 +21,14 @@ import { alpha } from '@mui/material/styles'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
-import { PullToRefreshContainer } from '../../components/PullToRefreshContainer'
-import { colors } from '../../colors'
-import { getApiErrorMessage } from '../../lib/api/errors'
-import { formatInventoryDate, formatInventoryRecency } from './inventoryFormatting'
+import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
+import { PullToRefreshContainer } from '../../../components/PullToRefreshContainer'
+import { colors } from '../../../colors'
+import { getApiErrorMessage } from '../../../lib/api/errors'
+import {
+  formatInventoryDate,
+  formatInventoryRecency,
+} from '../utils/inventoryFormatting'
 import {
   filterInventoryItems,
   filterInventoryPackGroups,
@@ -33,10 +36,10 @@ import {
   getFailedInventory,
   getGroupedUnassignedInventory,
   getInventoryCounts,
-} from './inventorySelectors'
-import { useInventoryQuery } from './hooks/useInventoryQuery'
-import { ReassignmentModal } from './ReassignmentModal'
-import type { InventoryItem, InventoryPackGroup, InventoryTab } from './types'
+} from '../utils/inventorySelectors'
+import { useInventoryQuery } from '../hooks/useInventoryQuery'
+import { ReassignmentModal } from '../components/ReassignmentModal'
+import type { InventoryItem, InventoryPackGroup, InventoryTab } from '../types'
 
 const searchPlaceholderByTab: Record<InventoryTab, string> = {
   unassigned: 'Search by pack',

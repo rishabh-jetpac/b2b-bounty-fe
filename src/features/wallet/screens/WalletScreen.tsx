@@ -12,21 +12,21 @@ import {
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import { useState, type ReactNode } from 'react'
-import { useAuthenticatedHeader } from '../../app/useAuthenticatedHeader'
-import { PullToRefreshContainer } from '../../components/PullToRefreshContainer'
-import { colors } from '../../colors'
-import { getApiErrorMessage } from '../../lib/api/errors'
-import { WalletTopUpDialog } from './WalletTopUpDialog'
-import { useWalletQuery } from './hooks/useWalletQuery'
-import { useWalletTransactionsQuery } from './hooks/useWalletTransactionsQuery'
-import type { WalletTransaction, WalletTransactionType } from './types'
+import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
+import { PullToRefreshContainer } from '../../../components/PullToRefreshContainer'
+import { colors } from '../../../colors'
+import { getApiErrorMessage } from '../../../lib/api/errors'
+import { WalletTopUpDialog } from '../components/WalletTopUpDialog'
+import { useWalletQuery } from '../hooks/useWalletQuery'
+import { useWalletTransactionsQuery } from '../hooks/useWalletTransactionsQuery'
+import type { WalletTransaction, WalletTransactionType } from '../types'
 import {
   formatWalletCurrency,
   formatWalletTransactionAmount,
   formatWalletTransactionDate,
   formatWalletTransactionId,
   formatWalletUpdatedAt,
-} from './walletFormatting'
+} from '../utils/walletFormatting'
 
 export function WalletScreen() {
   const walletQuery = useWalletQuery()

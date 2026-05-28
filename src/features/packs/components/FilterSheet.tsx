@@ -7,7 +7,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { colors } from '../../colors'
+import { colors } from '../../../colors'
 import { BottomSheet } from './BottomSheet'
 
 type FilterSheetOption<TValue extends string | number> = {
