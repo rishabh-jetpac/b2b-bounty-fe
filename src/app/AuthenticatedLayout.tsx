@@ -16,15 +16,35 @@ import {
 import { Link as RouterLink, Outlet, useLocation } from 'react-router'
 import { useState } from 'react'
 import { colors } from '../colors'
+import { useAuthStore } from '../store/authStore'
 import type { AppShellHeader } from './useAuthenticatedHeader'
 
-export function AuthenticatedLayout() {
+type AuthenticatedLayoutProps = {
+  showBottomNavigation?: boolean
+}
+
+export function AuthenticatedLayout({
+  showBottomNavigation = true,
+}: AuthenticatedLayoutProps) {
   const location = useLocation()
+  const isAuthenticated = useAuthStore((state) => Boolean(state.accessToken && state.user))
   const [header, setHeader] = useState<AppShellHeader>({
     title: 'Packs',
   })
-  const [bottomNavigationVisible, setBottomNavigationVisible] = useState(true)
+  const [bottomNavigationVisible, setBottomNavigationVisible] = useState(showBottomNavigation)
   const activeBottomNavigationValue = getBottomNavigationValue(location.pathname)
+  const contentPaddingBottom =
+    header.contentPaddingBottom ??
+    (bottomNavigationVisible
+      ? 'calc(108px + env(safe-area-inset-bottom))'
+      : 'calc(24px + env(safe-area-inset-bottom))')
+  const inventoryLinkProps = getBottomNavigationLinkProps('/inventory', isAuthenticated)
+  const walletLinkProps = getBottomNavigationLinkProps('/wallet', isAuthenticated)
+  const profileLinkProps = getBottomNavigationLinkProps('/profile', isAuthenticated)
+
+  function handleBottomNavigationVisibilityChange(visible: boolean) {
+    setBottomNavigationVisible(showBottomNavigation ? visible : false)
+  }
 
   return (
     <Box
@@ -110,15 +130,13 @@ export function AuthenticatedLayout() {
         sx={{
           px: { xs: 2, sm: 3 },
           pt: { xs: 9.5, sm: 10.25 },
-          pb: bottomNavigationVisible
-            ? 'calc(108px + env(safe-area-inset-bottom))'
-            : 'calc(24px + env(safe-area-inset-bottom))',
+          pb: contentPaddingBottom,
         }}
       >
-        <Outlet context={{ setBottomNavigationVisible, setHeader }} />
+        <Outlet context={{ setBottomNavigationVisible: handleBottomNavigationVisibilityChange, setHeader }} />
       </Container>
 
-      {bottomNavigationVisible ? (
+      {showBottomNavigation && bottomNavigationVisible ? (
         <Paper
           elevation={0}
           square
@@ -159,7 +177,8 @@ export function AuthenticatedLayout() {
                 value="/inventory"
                 component={RouterLink}
                 icon={<Inventory2OutlinedIcon />}
-                to="/inventory"
+                state={inventoryLinkProps.state}
+                to={inventoryLinkProps.to}
                 sx={bottomNavigationActionSx}
               />
               <BottomNavigationAction
@@ -167,7 +186,8 @@ export function AuthenticatedLayout() {
                 value="/wallet"
                 component={RouterLink}
                 icon={<AccountBalanceWalletOutlinedIcon />}
-                to="/wallet"
+                state={walletLinkProps.state}
+                to={walletLinkProps.to}
                 sx={bottomNavigationActionSx}
               />
               <BottomNavigationAction
@@ -175,7 +195,8 @@ export function AuthenticatedLayout() {
                 value="/profile"
                 component={RouterLink}
                 icon={<PersonOutlineRoundedIcon />}
-                to="/profile"
+                state={profileLinkProps.state}
+                to={profileLinkProps.to}
                 sx={bottomNavigationActionSx}
               />
             </BottomNavigation>
@@ -220,4 +241,19 @@ function getBottomNavigationValue(pathname: string) {
   }
 
   return false
+}
+
+function getBottomNavigationLinkProps(targetPath: string, isAuthenticated: boolean) {
+  if (isAuthenticated) {
+    return {
+      to: targetPath,
+    }
+  }
+
+  return {
+    to: '/login',
+    state: {
+      from: targetPath,
+    },
+  }
 }

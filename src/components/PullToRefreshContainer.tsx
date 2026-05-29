@@ -1,4 +1,4 @@
-import { CircularProgress, Stack, Typography } from '@mui/material'
+import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import type { ReactElement } from 'react'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import { colors } from '../colors'
@@ -15,18 +15,33 @@ export function PullToRefreshContainer({
   onRefresh,
 }: PullToRefreshContainerProps) {
   return (
-    <PullToRefresh
-      backgroundColor={colors.background}
-      isPullable={isPullable}
-      maxPullDownDistance={92}
-      onRefresh={onRefresh}
-      pullDownThreshold={72}
-      pullingContent={<RefreshIndicator label="Pull to refresh" />}
-      refreshingContent={<RefreshIndicator label="Refreshing" loading />}
-      resistance={1.75}
+    <Box
+      sx={{
+        height: '100%',
+        minHeight: 0,
+      }}
     >
-      {children}
-    </PullToRefresh>
+      <PullToRefresh
+        backgroundColor={colors.background}
+        className="pull-to-refresh-container"
+        isPullable={isPullable}
+        maxPullDownDistance={92}
+        onRefresh={onRefresh}
+        pullDownThreshold={72}
+        pullingContent={<RefreshIndicator label="Pull to refresh" />}
+        refreshingContent={<RefreshIndicator label="Refreshing" loading />}
+        resistance={1.75}
+      >
+        <Box
+          sx={{
+            height: '100%',
+            minHeight: 0,
+          }}
+        >
+          {children}
+        </Box>
+      </PullToRefresh>
+    </Box>
   )
 }
 

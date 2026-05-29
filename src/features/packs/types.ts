@@ -10,7 +10,8 @@ export type Destination = {
 
 export type Pack = {
   id: string
-  name: string
+  displayName?: string
+  name?: string
   price: {
     currency: string
     value: string

@@ -18,6 +18,7 @@ function normalizePack(pack: PackApiItem): Pack {
 
   return {
     id: pack.id,
+    displayName: pack.name,
     name: pack.name,
     price: {
       currency: 'USD',

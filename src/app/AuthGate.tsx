@@ -21,15 +21,12 @@ function AuthGateLoader() {
 
 export function RootRedirect() {
   const hydrated = useAuthStore((state) => state.hydrated)
-  const isAuthenticated = useAuthStore(
-    (state) => Boolean(state.accessToken && state.user),
-  )
 
   if (!hydrated) {
     return <AuthGateLoader />
   }
 
-  return <Navigate replace to={isAuthenticated ? '/packs' : '/login'} />
+  return <Navigate replace to="/packs" />
 }
 
 export function GuestOnlyRoute() {

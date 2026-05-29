@@ -22,6 +22,19 @@ export const router = createBrowserRouter([
     element: <RootRedirect />,
   },
   {
+    element: <AuthenticatedLayout />,
+    children: [
+      {
+        path: '/packs',
+        element: <PacksRoute />,
+      },
+      {
+        path: '/packs/:pageName',
+        element: <PacksDestinationRoute />,
+      },
+    ],
+  },
+  {
     element: <GuestOnlyRoute />,
     children: [
       {
@@ -40,14 +53,6 @@ export const router = createBrowserRouter([
       {
         element: <AuthenticatedLayout />,
         children: [
-          {
-            path: '/packs',
-            element: <PacksRoute />,
-          },
-          {
-            path: '/packs/:pageName',
-            element: <PacksDestinationRoute />,
-          },
           {
             path: '/inventory',
             element: <HistoryRoute />,

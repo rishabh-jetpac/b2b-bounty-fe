@@ -14,11 +14,22 @@ export type PacksResponse = {
   data: PackApiItem[]
 }
 
-export type RevampDestinationApiRecord = Record<string, unknown>
+export type RevampDestinationApiItem = {
+  displayName: string
+  pageId: string
+  pageName: string
+}
 
-export type RevampDestinationDirectoryResponse =
-  | RevampDestinationApiRecord
-  | RevampDestinationApiRecord[]
+export type RevampDestinationDirectoryResponse = {
+  data: {
+    allPacks: RevampDestinationApiItem[]
+    limit: number
+    page: number
+    total: number
+    totalPages: number
+  }
+  status: string
+}
 
 export type RevampDestinationPackApiRecord = Record<string, unknown>
 

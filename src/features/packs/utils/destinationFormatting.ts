@@ -11,6 +11,18 @@ export function normalizeSearchQuery(query: string) {
   return query.trim()
 }
 
+export function getDestinationMonogram(displayName: string) {
+  const letters = displayName
+    .split(/[\s/-]+/)
+    .map((segment) => segment.replace(/[^a-z]/gi, ''))
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((segment) => segment[0]?.toUpperCase() ?? '')
+    .join('')
+
+  return letters || 'ES'
+}
+
 export function prettifyDestinationPageName(pageName: string) {
   return normalizeRegionLabel(pageName.replace(/-+/g, ' '))
 }

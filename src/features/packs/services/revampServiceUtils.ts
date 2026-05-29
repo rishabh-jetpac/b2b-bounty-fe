@@ -23,6 +23,14 @@ export function extractFirstArray(value: unknown): unknown[] {
     if (Array.isArray(nestedValue)) {
       return nestedValue
     }
+
+    if (isRecord(nestedValue)) {
+      const nestedArray = extractFirstArray(nestedValue)
+
+      if (nestedArray.length > 0) {
+        return nestedArray
+      }
+    }
   }
 
   return []

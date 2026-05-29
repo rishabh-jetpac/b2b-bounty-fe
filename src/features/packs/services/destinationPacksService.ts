@@ -65,8 +65,10 @@ function normalizeDestinationPack(rawPack: RevampDestinationPackApiRecord) {
   const dataInGB = getNumber(rawPack, ['data_gb', 'dataInGB', 'dataGb', 'data']) ?? 0
   const validityInDays =
     getNumber(rawPack, ['validity_days', 'validityInDays', 'validity']) ?? 0
-  const name =
-    getString(rawPack, ['name', 'pack_name', 'packName', 'title']) ?? 'Destination Pack'
+  const displayName =
+    getString(rawPack, ['display_name', 'displayName', 'name', 'pack_name', 'packName', 'title']) ??
+    undefined
+  const name = getString(rawPack, ['name', 'pack_name', 'packName', 'title']) ?? undefined
   const countryCode =
     getString(rawPack, ['country_code', 'countryCode'])?.toUpperCase() ?? ''
   const countryDisplayName = getCountryDisplayName(rawPack)
@@ -76,6 +78,7 @@ function normalizeDestinationPack(rawPack: RevampDestinationPackApiRecord) {
 
   return {
     id,
+    displayName,
     name,
     price: {
       currency,

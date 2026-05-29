@@ -8,6 +8,7 @@ export type AppShellLeadingAction = {
 }
 
 export type AppShellHeader = {
+  contentPaddingBottom?: string
   leadingAction?: AppShellLeadingAction
   hideBottomNavigation?: boolean
   rightText?: string
@@ -22,11 +23,12 @@ export type AppShellOutletContext = {
 export function useAuthenticatedHeader(header: AppShellHeader) {
   const { setBottomNavigationVisible, setHeader } =
     useOutletContext<AppShellOutletContext>()
-  const { hideBottomNavigation = false, leadingAction, rightText, title } = header
+  const { contentPaddingBottom, hideBottomNavigation = false, leadingAction, rightText, title } =
+    header
 
   useEffect(() => {
-    setHeader({ leadingAction, rightText, title })
-  }, [leadingAction, rightText, setHeader, title])
+    setHeader({ contentPaddingBottom, leadingAction, rightText, title })
+  }, [contentPaddingBottom, leadingAction, rightText, setHeader, title])
 
   useEffect(() => {
     setBottomNavigationVisible(!hideBottomNavigation)

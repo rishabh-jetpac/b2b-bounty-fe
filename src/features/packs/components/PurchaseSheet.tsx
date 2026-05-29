@@ -1,18 +1,11 @@
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded'
-import {
-  Alert,
-  Box,
-  Button,
-  IconButton,
-  Stack,
-  Typography,
-} from '@mui/material'
-import { alpha } from '@mui/material/styles'
+import { Alert, Box, Button, IconButton, Stack, Typography } from '@mui/material'
 import { colors } from '../../../colors'
 import { BottomSheet } from './BottomSheet'
 import {
+  formatDataAmount,
   formatBalance,
   formatValidity,
   getPackPriceValue,
@@ -20,10 +13,10 @@ import {
 import type { Pack } from '../types'
 
 type PurchaseSheetProps = {
-  balance: number
+  destinationTitle: string
   errorMessage?: string
-  isBalancePending: boolean
   isPending: boolean
+  maxQuantity: number
   onClose: () => void
   onDecrease: () => void
   onIncrease: () => void
@@ -34,10 +27,10 @@ type PurchaseSheetProps = {
 }
 
 export function PurchaseSheet({
-  balance,
+  destinationTitle,
   errorMessage,
-  isBalancePending,
   isPending,
+  maxQuantity,
   onClose,
   onDecrease,
   onIncrease,
@@ -51,7 +44,7 @@ export function PurchaseSheet({
   }
 
   const totalPrice = getPackPriceValue(pack) * quantity
-  const hasInsufficientBalance = !isBalancePending && balance < totalPrice
+  const packTitle = `${destinationTitle} ${pack.dataInGB === -1 ? 'Unlimited' : formatDataAmount(pack.dataInGB)}`
 
   return (
     <BottomSheet
@@ -94,7 +87,7 @@ export function PurchaseSheet({
                   color: colors.onSurface,
                 }}
               >
-                {pack.name}
+                {packTitle}
               </Typography>
               <Typography
                 variant="overline"
@@ -129,7 +122,6 @@ export function PurchaseSheet({
                   px: 1,
                   py: 0.5,
                   borderRadius: 999,
-                  border: `1px solid ${colors.outlineVariant}`,
                   backgroundColor: colors.surfaceContainerLowest,
                 }}
               >
@@ -154,7 +146,7 @@ export function PurchaseSheet({
                 </Typography>
                 <IconButton
                   aria-label="Increase quantity"
-                  disabled={isPending}
+                  disabled={isPending || quantity >= maxQuantity}
                   onClick={onIncrease}
                   sx={stepperButtonSx}
                 >
@@ -164,25 +156,6 @@ export function PurchaseSheet({
             </Box>
           </Stack>
 
-          {isBalancePending ? (
-            <Alert severity="info" variant="outlined">
-              Refreshing wallet balance before purchase.
-            </Alert>
-          ) : null}
-
-          {hasInsufficientBalance ? (
-            <Alert
-              severity="warning"
-              sx={{
-                border: `1px solid ${alpha(colors.secondaryContainer, 0.5)}`,
-                backgroundColor: alpha(colors.secondaryFixed, 0.55),
-                color: colors.onSurface,
-              }}
-            >
-              Balance {formatBalance(balance)} is not enough for this purchase.
-            </Alert>
-          ) : null}
-
           {errorMessage ? (
             <Alert severity="error" variant="outlined">
               {errorMessage}
@@ -191,7 +164,7 @@ export function PurchaseSheet({
 
           <Stack spacing={1}>
             <Button
-              disabled={isPending || isBalancePending || hasInsufficientBalance}
+              disabled={isPending}
               onClick={onPurchase}
               size="large"
               sx={{
