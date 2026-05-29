@@ -14,6 +14,18 @@ export type PacksResponse = {
   data: PackApiItem[]
 }
 
+export type RevampDestinationApiRecord = Record<string, unknown>
+
+export type RevampDestinationDirectoryResponse =
+  | RevampDestinationApiRecord
+  | RevampDestinationApiRecord[]
+
+export type RevampDestinationPackApiRecord = Record<string, unknown>
+
+export type RevampDestinationItemsResponse =
+  | RevampDestinationPackApiRecord
+  | RevampDestinationPackApiRecord[]
+
 export type PurchaseRequest = {
   pack_id: string
   quantity: number

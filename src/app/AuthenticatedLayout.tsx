@@ -1,5 +1,7 @@
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined'
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
+import IconButton from '@mui/material/IconButton'
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined'
 import {
@@ -14,11 +16,7 @@ import {
 import { Link as RouterLink, Outlet, useLocation } from 'react-router'
 import { useState } from 'react'
 import { colors } from '../colors'
-
-type AppShellHeader = {
-  rightText?: string
-  title: string
-}
+import type { AppShellHeader } from './useAuthenticatedHeader'
 
 export function AuthenticatedLayout() {
   const location = useLocation()
@@ -26,6 +24,7 @@ export function AuthenticatedLayout() {
     title: 'Packs',
   })
   const [bottomNavigationVisible, setBottomNavigationVisible] = useState(true)
+  const activeBottomNavigationValue = getBottomNavigationValue(location.pathname)
 
   return (
     <Box
@@ -59,6 +58,20 @@ export function AuthenticatedLayout() {
               minHeight: { xs: 58, sm: 62 },
             }}
           >
+            {header.leadingAction ? (
+              <IconButton
+                aria-label={header.leadingAction.ariaLabel}
+                onClick={header.leadingAction.onClick}
+                sx={{
+                  ml: -1,
+                  mr: 0.25,
+                  color: colors.onSurface,
+                  flexShrink: 0,
+                }}
+              >
+                {header.leadingAction.icon === 'back' ? <ArrowBackRoundedIcon /> : null}
+              </IconButton>
+            ) : null}
             <Typography
               variant="h2"
               sx={{
@@ -127,7 +140,7 @@ export function AuthenticatedLayout() {
           >
             <BottomNavigation
               showLabels
-              value={location.pathname}
+              value={activeBottomNavigationValue}
               sx={{
                 height: 74,
                 backgroundColor: 'transparent',
@@ -188,3 +201,23 @@ const bottomNavigationActionSx = {
     fontWeight: 700,
   },
 } as const
+
+function getBottomNavigationValue(pathname: string) {
+  if (pathname.startsWith('/packs')) {
+    return '/packs'
+  }
+
+  if (pathname.startsWith('/inventory')) {
+    return '/inventory'
+  }
+
+  if (pathname.startsWith('/wallet')) {
+    return '/wallet'
+  }
+
+  if (pathname.startsWith('/profile')) {
+    return '/profile'
+  }
+
+  return false
+}

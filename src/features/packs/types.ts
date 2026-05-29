@@ -3,6 +3,11 @@ export type CountryInfo = {
   code: string
 }
 
+export type Destination = {
+  displayName: string
+  pageName: string
+}
+
 export type Pack = {
   id: string
   name: string
@@ -15,6 +20,19 @@ export type Pack = {
   validityInDays: number
   countryInfo?: CountryInfo
 }
+
+export type DestinationPackSection =
+  | {
+      kind: 'unlimited'
+      title: 'Unlimited'
+      packs: Pack[]
+    }
+  | {
+      kind: 'days'
+      packs: Pack[]
+      title: string
+      validityInDays: number
+    }
 
 export type PurchasedInventoryItem = {
   id: string
@@ -30,11 +48,3 @@ export type PurchaseResult = {
   packName: string
   items: PurchasedInventoryItem[]
 }
-
-export type PacksFilters = {
-  country?: string
-  validityInDays?: number
-  dataInGB?: number
-}
-
-export type FilterSheetKey = 'country' | 'validityInDays' | 'dataInGB'

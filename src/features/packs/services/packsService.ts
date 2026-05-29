@@ -1,14 +1,7 @@
 import { apiClient } from '../../../lib/api/client'
 import type { PackApiItem, PacksResponse } from '../apiTypes'
 import type { Pack } from '../types'
-
-const uppercaseRegionLabels = new Map([
-  ['eu', 'EU'],
-  ['uae', 'UAE'],
-  ['uk', 'UK'],
-  ['usa', 'USA'],
-  ['us', 'US'],
-])
+import { normalizeRegionLabel } from '../utils/destinationFormatting'
 
 export async function getPacks() {
   const response = await apiClient.get<PacksResponse>('/api/v1/packs')
@@ -41,25 +34,4 @@ function normalizePack(pack: PackApiItem): Pack {
           }
         : undefined,
   }
-}
-
-function normalizeRegionLabel(region: string) {
-  const sanitizedRegion = region.trim().replace(/[_-]+/g, ' ')
-
-  if (!sanitizedRegion) {
-    return ''
-  }
-
-  return sanitizedRegion
-    .split(/\s+/)
-    .map((segment) => {
-      const uppercaseMatch = uppercaseRegionLabels.get(segment.toLowerCase())
-
-      if (uppercaseMatch) {
-        return uppercaseMatch
-      }
-
-      return segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase()
-    })
-    .join(' ')
 }

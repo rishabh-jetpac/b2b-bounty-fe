@@ -11,6 +11,7 @@ import CreateSubadminRoute from '../routes/CreateSubadminRoute'
 import HistoryRoute from '../routes/HistoryRoute'
 import InventoryAssignmentRoute from '../routes/InventoryAssignmentRoute'
 import LoginRoute from '../routes/LoginRoute'
+import PacksDestinationRoute from '../routes/PacksDestinationRoute'
 import PacksRoute from '../routes/PacksRoute'
 import ProfileRoute from '../routes/ProfileRoute'
 import WalletRoute from '../routes/WalletRoute'
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
           {
             path: '/packs',
             element: <PacksRoute />,
+          },
+          {
+            path: '/packs/:pageName',
+            element: <PacksDestinationRoute />,
           },
           {
             path: '/inventory',

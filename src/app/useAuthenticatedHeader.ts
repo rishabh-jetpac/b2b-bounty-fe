@@ -1,25 +1,32 @@
 import { useEffect } from 'react'
 import { useOutletContext } from 'react-router'
 
-type AppShellHeader = {
+export type AppShellLeadingAction = {
+  ariaLabel: string
+  icon: 'back'
+  onClick: () => void
+}
+
+export type AppShellHeader = {
+  leadingAction?: AppShellLeadingAction
   hideBottomNavigation?: boolean
   rightText?: string
   title: string
 }
 
-type AppShellOutletContext = {
+export type AppShellOutletContext = {
   setBottomNavigationVisible: (visible: boolean) => void
-  setHeader: (header: AppShellHeader) => void
+  setHeader: (header: Omit<AppShellHeader, 'hideBottomNavigation'>) => void
 }
 
 export function useAuthenticatedHeader(header: AppShellHeader) {
   const { setBottomNavigationVisible, setHeader } =
     useOutletContext<AppShellOutletContext>()
-  const { hideBottomNavigation = false, rightText, title } = header
+  const { hideBottomNavigation = false, leadingAction, rightText, title } = header
 
   useEffect(() => {
-    setHeader({ rightText, title })
-  }, [rightText, setHeader, title])
+    setHeader({ leadingAction, rightText, title })
+  }, [leadingAction, rightText, setHeader, title])
 
   useEffect(() => {
     setBottomNavigationVisible(!hideBottomNavigation)

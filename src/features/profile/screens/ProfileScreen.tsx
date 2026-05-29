@@ -33,7 +33,14 @@ export function ProfileScreen() {
   }
 
   return (
-    <Stack spacing={2.25}>
+    <Stack
+      sx={{
+        minHeight: {
+          xs: 'calc(100svh - 58px - 108px - env(safe-area-inset-bottom))',
+          sm: 'calc(100svh - 62px - 108px - env(safe-area-inset-bottom))',
+        },
+      }}
+    >
       <Paper
         elevation={0}
         sx={{
@@ -67,7 +74,9 @@ export function ProfileScreen() {
         </Stack>
       </Paper>
 
-      <Stack spacing={1.5}>
+      <Box sx={{ flex: 1 }} />
+
+      <Stack spacing={1.5} sx={{ pt: 2.25 }}>
         {isAdmin ? (
           <Button
             fullWidth
