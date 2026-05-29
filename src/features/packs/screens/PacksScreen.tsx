@@ -7,7 +7,11 @@ import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
 import { getApiErrorMessage } from '../../../lib/api/errors'
 import { DestinationCard } from '../components/DestinationCard'
 import { DestinationSearchField } from '../components/DestinationSearchField'
-import { PacksLoadingState, PacksRetryButton, PacksStateCard } from '../components/PacksStateCard'
+import {
+  DestinationListSkeleton,
+  PacksRetryButton,
+  PacksStateCard,
+} from '../components/PacksStateCard'
 import { useDestinationDirectoryQuery } from '../hooks/useDestinationDirectoryQuery'
 import type { Destination } from '../types'
 import { normalizeSearchQuery } from '../utils/destinationFormatting'
@@ -111,14 +115,11 @@ export function PacksScreen() {
           <Box
             sx={{
               px: 0.5,
-              pb: 2,
+              pb: { xs: 4, sm: 5 },
             }}
           >
             {destinationsQuery.isPending ? (
-              <PacksLoadingState
-                description="Fetching the latest destination directory for this account."
-                title="Loading destinations"
-              />
+              <DestinationListSkeleton />
             ) : destinationsQuery.isError && destinations.length === 0 ? (
               <PacksStateCard
                 action={

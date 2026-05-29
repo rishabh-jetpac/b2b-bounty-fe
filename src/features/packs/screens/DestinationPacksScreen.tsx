@@ -8,7 +8,11 @@ import { getApiErrorMessage } from '../../../lib/api/errors'
 import { useAuthStore } from '../../../store/authStore'
 import { useWalletQuery } from '../../wallet/hooks/useWalletQuery'
 import { PackCard } from '../components/PackCard'
-import { PacksLoadingState, PacksRetryButton, PacksStateCard } from '../components/PacksStateCard'
+import {
+  DestinationPacksSkeleton,
+  PacksRetryButton,
+  PacksStateCard,
+} from '../components/PacksStateCard'
 import { PurchaseSheet } from '../components/PurchaseSheet'
 import { useDestinationDirectoryQuery } from '../hooks/useDestinationDirectoryQuery'
 import { useDestinationPacksQuery } from '../hooks/useDestinationPacksQuery'
@@ -162,14 +166,11 @@ export function DestinationPacksScreen() {
               minHeight: 0,
               overflowY: 'auto',
               backgroundColor: 'transparent',
-              pb: selectedPack ? { xs: 27, sm: 31 } : 0,
+              pb: selectedPack ? { xs: 27, sm: 31 } : { xs: 4, sm: 5 },
             }}
           >
             {destinationPacksQuery.isPending ? (
-              <PacksLoadingState
-                description={`Fetching the latest packs for ${destinationTitle}.`}
-                title="Loading packs"
-              />
+              <DestinationPacksSkeleton />
             ) : destinationPacksQuery.isError && packs.length === 0 ? (
               <PacksStateCard
                 action={

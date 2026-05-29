@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Paper, Stack, Typography } from '@mui/material'
+import { Box, Button, Paper, Skeleton, Stack, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import type { ReactNode } from 'react'
 import { colors } from '../../../colors'
@@ -9,30 +9,118 @@ type PacksStateCardProps = {
   title: string
 }
 
-type PacksLoadingStateProps = {
-  description: string
-  title: string
+export function DestinationListSkeleton() {
+  return (
+    <Stack spacing={1.75} sx={{ pt: 2 }}>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <Paper elevation={0} key={index} sx={destinationSkeletonCardSx}>
+          <Stack direction="row" spacing={1.75} sx={{ alignItems: 'center', width: '100%' }}>
+            <Skeleton
+              animation="wave"
+              height={50}
+              sx={{ borderRadius: '18px', flexShrink: 0 }}
+              variant="rounded"
+              width={50}
+            />
+            <Stack spacing={0.75} sx={{ flex: 1, minWidth: 0 }}>
+              <Skeleton animation="wave" height={28} sx={{ borderRadius: 1 }} width="52%" />
+              <Skeleton animation="wave" height={18} sx={{ borderRadius: 1 }} width="72%" />
+            </Stack>
+            <Skeleton
+              animation="wave"
+              height={40}
+              sx={{ borderRadius: 999, flexShrink: 0 }}
+              variant="rounded"
+              width={40}
+            />
+          </Stack>
+        </Paper>
+      ))}
+    </Stack>
+  )
 }
 
-export function PacksLoadingState({ description, title }: PacksLoadingStateProps) {
+export function DestinationPacksSkeleton() {
   return (
-    <Paper elevation={0} sx={stateCardSx}>
-      <Stack
-        spacing={1.5}
+    <Stack spacing={2.5} sx={{ px: 0.5, pb: 1 }}>
+      <Box
         sx={{
-          minHeight: 220,
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+          px: 0.25,
+          pt: 0.5,
+          pb: 1,
+          backgroundColor: colors.background,
         }}
       >
-        <CircularProgress size={28} />
-        <Typography variant="h3" sx={{ color: colors.onSurface }}>
-          {title}
-        </Typography>
-        <Typography sx={{ color: colors.onSurfaceVariant }}>{description}</Typography>
-      </Stack>
-    </Paper>
+        <Stack direction="row" spacing={0.75} sx={{ width: 'max-content', p: 0.45 }}>
+          {[72, 104, 82].map((width, index) => (
+            <Skeleton
+              animation="wave"
+              height={38}
+              key={index}
+              sx={{ borderRadius: 999 }}
+              variant="rounded"
+              width={width}
+            />
+          ))}
+        </Stack>
+      </Box>
+
+      {Array.from({ length: 2 }).map((_, sectionIndex) => (
+        <Stack key={sectionIndex} spacing={1.25} sx={{ px: 0.25 }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Skeleton animation="wave" height={24} sx={{ borderRadius: 1 }} width={110} />
+            <Skeleton
+              animation="wave"
+              height={30}
+              sx={{ borderRadius: 999, flexShrink: 0 }}
+              variant="rounded"
+              width={58}
+            />
+          </Stack>
+
+          <Stack spacing={1.25}>
+            {Array.from({ length: 2 }).map((__, cardIndex) => (
+              <Paper elevation={0} key={cardIndex} sx={packSkeletonCardSx}>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  sx={{
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    px: 2.25,
+                    py: 2,
+                  }}
+                >
+                  <Stack spacing={0.6} sx={{ minWidth: 0, flex: 1 }}>
+                    <Skeleton animation="wave" height={18} sx={{ borderRadius: 1 }} width="32%" />
+                    <Skeleton animation="wave" height={34} sx={{ borderRadius: 1 }} width="44%" />
+                    <Skeleton animation="wave" height={26} sx={{ borderRadius: 1 }} width="28%" />
+                  </Stack>
+                  <Skeleton
+                    animation="wave"
+                    height={24}
+                    sx={{ borderRadius: '50%', flexShrink: 0 }}
+                    variant="circular"
+                    width={24}
+                  />
+                </Stack>
+              </Paper>
+            ))}
+          </Stack>
+        </Stack>
+      ))}
+    </Stack>
   )
 }
 
@@ -69,6 +157,23 @@ const stateCardSx = {
   border: `1px solid ${colors.outlineVariant}`,
   px: 2.5,
   py: 3,
+} as const
+
+const destinationSkeletonCardSx = {
+  minHeight: 108,
+  px: 2.25,
+  py: 2,
+  borderRadius: 2,
+  border: `1px solid ${alpha(colors.primaryFixedDim, 0.52)}`,
+  backgroundColor: colors.surfaceContainerLowest,
+} as const
+
+const packSkeletonCardSx = {
+  overflow: 'hidden',
+  boxSizing: 'border-box',
+  borderRadius: 2,
+  border: `1px solid ${colors.outlineVariant}`,
+  background: `linear-gradient(180deg, ${colors.surfaceContainerLowest} 0%, ${alpha(colors.surfaceContainerLow, 0.9)} 100%)`,
 } as const
 
 const retryButtonSx = {

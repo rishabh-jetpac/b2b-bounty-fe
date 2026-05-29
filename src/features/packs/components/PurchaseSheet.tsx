@@ -168,9 +168,10 @@ export function PurchaseSheet({
               onClick={onPurchase}
               size="large"
               sx={{
-                backgroundColor: colors.primaryContainer,
+                background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryContainer} 52%, ${colors.primaryContainer} 100%)`,
+                color: colors.onPrimary,
                 '&:hover': {
-                  backgroundColor: colors.primary,
+                  background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryContainer} 52%, ${colors.primaryContainer} 100%)`,
                 },
               }}
               variant="contained"
