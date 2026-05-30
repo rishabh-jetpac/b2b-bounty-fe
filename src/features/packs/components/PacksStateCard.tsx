@@ -51,7 +51,7 @@ export function DestinationPacksSkeleton() {
           px: 0.25,
           pt: 0.5,
           pb: 1,
-          backgroundColor: colors.background,
+          backgroundColor: colors.surfaceContainerLowest,
         }}
       >
         <Stack direction="row" spacing={0.75} sx={{ width: 'max-content', p: 0.45 }}>
@@ -70,23 +70,7 @@ export function DestinationPacksSkeleton() {
 
       {Array.from({ length: 2 }).map((_, sectionIndex) => (
         <Stack key={sectionIndex} spacing={1.25} sx={{ px: 0.25 }}>
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Skeleton animation="wave" height={24} sx={{ borderRadius: 1 }} width={110} />
-            <Skeleton
-              animation="wave"
-              height={30}
-              sx={{ borderRadius: 999, flexShrink: 0 }}
-              variant="rounded"
-              width={58}
-            />
-          </Stack>
+          <Skeleton animation="wave" height={24} sx={{ borderRadius: 1 }} width={110} />
 
           <Stack spacing={1.25}>
             {Array.from({ length: 2 }).map((__, cardIndex) => (
@@ -110,7 +94,7 @@ export function DestinationPacksSkeleton() {
                   <Skeleton
                     animation="wave"
                     height={24}
-                    sx={{ borderRadius: '50%', flexShrink: 0 }}
+                    sx={{ borderRadius: '50%', flexShrink: 0, alignSelf: 'center' }}
                     variant="circular"
                     width={24}
                   />
@@ -164,7 +148,7 @@ const destinationSkeletonCardSx = {
   px: 2.25,
   py: 2,
   borderRadius: 2,
-  border: `1px solid ${alpha(colors.primaryFixedDim, 0.52)}`,
+  border: `1px solid ${colors.outlineVariant}`,
   backgroundColor: colors.surfaceContainerLowest,
 } as const
 
@@ -173,7 +157,7 @@ const packSkeletonCardSx = {
   boxSizing: 'border-box',
   borderRadius: 2,
   border: `1px solid ${colors.outlineVariant}`,
-  background: `linear-gradient(180deg, ${colors.surfaceContainerLowest} 0%, ${alpha(colors.surfaceContainerLow, 0.9)} 100%)`,
+  backgroundColor: colors.surfaceContainerLowest,
 } as const
 
 const retryButtonSx = {

@@ -24,7 +24,7 @@ export function DestinationSearchField({
         px: 0.25,
         pt: 1,
         pb: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.surfaceContainerLowest,
       }}
     >
       <TextField
@@ -55,11 +55,11 @@ export function DestinationSearchField({
         sx={{
           '& .MuiOutlinedInput-root': {
             borderRadius: 3,
-            backgroundColor: 'transparent',
+            backgroundColor: colors.surfaceContainerLowest,
             boxShadow: 'none',
           },
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: alpha(colors.primaryFixedDim, 0.55),
+            borderColor: alpha(colors.outlineVariant, 0.95),
           },
           '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
             borderColor: colors.primaryContainer,

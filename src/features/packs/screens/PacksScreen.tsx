@@ -4,6 +4,7 @@ import { Box, Stack } from '@mui/material'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
+import { colors } from '../../../colors'
 import { getApiErrorMessage } from '../../../lib/api/errors'
 import { DestinationCard } from '../components/DestinationCard'
 import { DestinationSearchField } from '../components/DestinationSearchField'
@@ -88,12 +89,14 @@ export function PacksScreen() {
         },
         minHeight: 0,
         overflow: 'hidden',
+        backgroundColor: colors.surfaceContainerLowest,
       }}
     >
       <Stack
         sx={{
           height: '100%',
           minHeight: 0,
+          backgroundColor: colors.surfaceContainerLowest,
         }}
       >
         <Box
@@ -103,7 +106,7 @@ export function PacksScreen() {
             flex: 1,
             minHeight: 0,
             overflowY: 'auto',
-            backgroundColor: 'transparent',
+            backgroundColor: colors.surfaceContainerLowest,
           }}
         >
           <DestinationSearchField

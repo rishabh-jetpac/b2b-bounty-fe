@@ -13,6 +13,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import { Link as RouterLink, Outlet, useLocation } from 'react-router'
 import { useState } from 'react'
 import { colors } from '../colors'
@@ -50,7 +51,7 @@ export function AuthenticatedLayout({
     <Box
       sx={{
         minHeight: '100svh',
-        backgroundColor: colors.background,
+        backgroundColor: colors.surfaceContainerLowest,
       }}
     >
       <Paper
@@ -60,8 +61,8 @@ export function AuthenticatedLayout({
           position: 'fixed',
           inset: '0 0 auto 0',
           zIndex: (theme) => theme.zIndex.appBar,
-          borderBottom: `1px solid ${colors.outlineVariant}`,
           backgroundColor: colors.surfaceContainerLowest,
+          boxShadow: `0 4px 12px ${alpha(colors.outline, 0.16)}`,
         }}
       >
         <Container
@@ -131,6 +132,7 @@ export function AuthenticatedLayout({
           px: { xs: 2, sm: 3 },
           pt: { xs: 9.5, sm: 10.25 },
           pb: contentPaddingBottom,
+          backgroundColor: colors.surfaceContainerLowest,
         }}
       >
         <Outlet context={{ setBottomNavigationVisible: handleBottomNavigationVisibilityChange, setHeader }} />

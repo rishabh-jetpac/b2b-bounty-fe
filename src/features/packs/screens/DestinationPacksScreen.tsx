@@ -147,28 +147,30 @@ export function DestinationPacksScreen() {
           height: {
             xs: 'calc(100svh - 58px - 74px - env(safe-area-inset-bottom))',
             sm: 'calc(100svh - 62px - 74px - env(safe-area-inset-bottom))',
-          },
+        },
+        minHeight: 0,
+        overflow: 'hidden',
+        backgroundColor: colors.surfaceContainerLowest,
+      }}
+    >
+      <Stack
+        sx={{
+          height: '100%',
           minHeight: 0,
-          overflow: 'hidden',
+          backgroundColor: colors.surfaceContainerLowest,
         }}
       >
-        <Stack
+        <Box
+          ref={scrollRef}
           sx={{
-            height: '100%',
+            position: 'relative',
+            flex: 1,
             minHeight: 0,
+            overflowY: 'auto',
+            backgroundColor: colors.surfaceContainerLowest,
+            pb: selectedPack ? { xs: 27, sm: 31 } : { xs: 4, sm: 5 },
           }}
         >
-          <Box
-            ref={scrollRef}
-            sx={{
-              position: 'relative',
-              flex: 1,
-              minHeight: 0,
-              overflowY: 'auto',
-              backgroundColor: 'transparent',
-              pb: selectedPack ? { xs: 27, sm: 31 } : { xs: 4, sm: 5 },
-            }}
-          >
             {destinationPacksQuery.isPending ? (
               <DestinationPacksSkeleton />
             ) : destinationPacksQuery.isError && packs.length === 0 ? (
@@ -200,7 +202,7 @@ export function DestinationPacksScreen() {
                     px: 0.25,
                     pt: 0.5,
                     pb: 1,
-                    backgroundColor: colors.background,
+                    backgroundColor: colors.surfaceContainerLowest,
                   }}
                 >
                   <Box
@@ -232,9 +234,9 @@ export function DestinationPacksScreen() {
                           label={filterOption.label}
                           onClick={() => handleFilterChange(filterOption.key)}
                           sx={{
-                            height: 38,
+                            height: 34,
+                            width: 96,
                             borderRadius: 999,
-                            px: 0.45,
                             fontSize: '0.84rem',
                             fontWeight: 700,
                             letterSpacing: '0.015em',
@@ -246,22 +248,24 @@ export function DestinationPacksScreen() {
                                 : colors.onSurfaceVariant,
                             border:
                               activeFilter === filterOption.key
-                                ? `1px solid ${alpha(colors.primaryFixedDim, 0.4)}`
+                                ? `1px solid ${alpha(colors.primaryContainer, 0.36)}`
                                 : `1px solid ${alpha(colors.outlineVariant, 0.95)}`,
                             background:
                               activeFilter === filterOption.key
-                                ? `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryContainer} 52%, ${colors.primaryFixedDim} 100%)`
-                                : `linear-gradient(180deg, ${alpha(colors.surfaceContainerLowest, 0.98)} 0%, ${alpha(colors.surfaceContainerLow, 0.92)} 100%)`,
+                                ? `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryContainer} 52%, ${colors.primaryContainer} 100%)`
+                                : colors.surfaceContainerLowest,
                             transform:
                               activeFilter === filterOption.key ? 'translateY(-1px)' : 'none',
                             '& .MuiChip-label': {
-                              px: 1.35,
+                              px: 1,
+                              width: '100%',
+                              textAlign: 'center',
                             },
                             '&:hover': {
                               background:
                                 activeFilter === filterOption.key
-                                  ? `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryContainer} 52%, ${colors.primaryFixedDim} 100%)`
-                                  : `linear-gradient(180deg, ${alpha(colors.surfaceContainerLow, 0.98)} 0%, ${alpha(colors.surfaceContainer, 0.94)} 100%)`,
+                                  ? `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryContainer} 52%, ${colors.primaryContainer} 100%)`
+                                  : colors.surfaceContainerLowest,
                             },
                           }}
                           variant="filled"
@@ -308,13 +312,13 @@ export function DestinationPacksScreen() {
                           px: 1.1,
                           py: 0.55,
                           borderRadius: 999,
-                          border: `1px solid ${alpha(colors.outlineVariant, 0.9)}`,
-                          backgroundColor: alpha(colors.surfaceContainerLow, 0.9),
+                          border: `1px solid ${alpha(colors.outlineVariant, 0.75)}`,
+                          backgroundColor: colors.surfaceContainerLowest,
                         }}
                       >
                         <Typography
                           sx={{
-                            color: colors.onSurfaceVariant,
+                            color: alpha(colors.onSurfaceVariant, 0.82),
                             fontSize: '0.78rem',
                             fontWeight: 700,
                           }}

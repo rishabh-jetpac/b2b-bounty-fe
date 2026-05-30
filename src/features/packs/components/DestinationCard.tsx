@@ -107,13 +107,13 @@ export function DestinationCard({ destination, onClick }: DestinationCardProps) 
             flexShrink: 0,
             display: 'grid',
             placeItems: 'center',
-            border: `1px solid ${alpha(colors.primaryContainer, 0.14)}`,
-            backgroundColor: alpha(colors.primaryContainer, 0.08),
+            border: `1px solid ${alpha(colors.outlineVariant, 0.72)}`,
+            backgroundColor: colors.surfaceContainerLowest,
           }}
         >
           <ChevronRightRoundedIcon
             sx={{
-              color: colors.primaryContainer,
+              color: alpha(colors.onSurfaceVariant, 0.72),
               flexShrink: 0,
             }}
           />

@@ -1,6 +1,5 @@
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded'
 import { Box, ButtonBase, Paper, Stack, Typography } from '@mui/material'
-import { alpha } from '@mui/material/styles'
 import { colors } from '../../../colors'
 import { formatDataAmount, formatPackPrice, formatValidity } from '../utils/packFormatting'
 import type { Pack } from '../types'
@@ -27,9 +26,7 @@ export function PackCard({ onSelect, pack, selected }: PackCardProps) {
         border: selected
           ? `2px solid ${colors.primaryContainer}`
           : `1px solid ${colors.outlineVariant}`,
-        background: selected
-          ? `linear-gradient(180deg, ${alpha(colors.primaryFixed, 0.92)} 0%, ${colors.surfaceContainerLowest} 100%)`
-          : `linear-gradient(180deg, ${colors.surfaceContainerLowest} 0%, ${alpha(colors.surfaceContainerLow, 0.9)} 100%)`,
+        backgroundColor: colors.surfaceContainerLowest,
         transform: selected ? 'translateY(-1px)' : 'none',
         transition: 'border-color 150ms ease, transform 150ms ease',
       }}
@@ -98,9 +95,7 @@ export function PackCard({ onSelect, pack, selected }: PackCardProps) {
                 ? colors.primaryContainer
                 : colors.surfaceContainerLowest,
               color: selected ? colors.onPrimary : 'transparent',
-              boxShadow: selected
-                ? `0 0 0 7px ${alpha(colors.primaryFixed, 0.92)}`
-                : 'none',
+              boxShadow: 'none',
               flexShrink: 0,
             }}
           >
