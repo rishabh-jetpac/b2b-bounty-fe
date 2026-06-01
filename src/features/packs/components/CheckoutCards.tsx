@@ -202,8 +202,8 @@ export function CheckoutSummaryCard({
       sx={{
         overflow: 'hidden',
         borderRadius: 1.5,
-        border: `1px solid ${alpha(colors.outlineVariant, 0.9)}`,
-        backgroundColor: alpha(colors.primaryFixed, 0.18),
+        border: `1px solid ${alpha(colors.outlineVariant, 0.92)}`,
+        backgroundColor: colors.surfaceContainerLowest
       }}
     >
       <Stack spacing={1.75} sx={{ px: { xs: 2, sm: 2.5 }, py: 2 }}>
@@ -244,8 +244,8 @@ export function CheckoutSummaryCard({
 
       <Box
         sx={{
-          borderTop: `1px solid ${alpha(colors.outlineVariant, 0.85)}`,
-          backgroundColor: alpha(colors.primaryFixed, 0.34),
+          borderTop: `1px solid ${alpha(colors.surfaceContainerLowest, 0.6)}`,
+          backgroundColor: colors.surfaceContainerLowest,
           px: { xs: 2, sm: 2.5 },
           py: 1.75,
         }}

@@ -173,10 +173,12 @@ function CheckoutFooter({
           onClick={onCancel}
           sx={{
             borderColor: colors.outlineVariant,
+            boxShadow: 'none',
             color: colors.onSurfaceVariant,
             '&:hover': {
               borderColor: colors.onSurfaceVariant,
               backgroundColor: colors.surfaceContainerLow,
+              boxShadow: 'none',
             },
           }}
           variant="outlined"

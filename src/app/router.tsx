@@ -6,9 +6,11 @@ import {
   ProtectedRoute,
   RootRedirect,
 } from './AuthGate'
+import ChangePasswordRoute from '../routes/ChangePasswordRoute'
 import CreateAccountRoute from '../routes/CreateAccountRoute'
 import CreateSubadminRoute from '../routes/CreateSubadminRoute'
 import CheckoutRoute from '../routes/CheckoutRoute'
+import ForgotPasswordRoute from '../routes/ForgotPasswordRoute'
 import HistoryRoute from '../routes/HistoryRoute'
 import InventoryAssignmentRoute from '../routes/InventoryAssignmentRoute'
 import LoginRoute from '../routes/LoginRoute'
@@ -45,6 +47,14 @@ export const router = createBrowserRouter([
       {
         path: '/create-account',
         element: <CreateAccountRoute />,
+      },
+      {
+        path: '/forgot-password',
+        element: <ForgotPasswordRoute />,
+      },
+      {
+        path: '/change-password',
+        element: <ChangePasswordRoute />,
       },
     ],
   },

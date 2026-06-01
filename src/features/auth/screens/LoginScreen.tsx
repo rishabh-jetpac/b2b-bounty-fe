@@ -2,9 +2,9 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail'
 import LoginIcon from '@mui/icons-material/Login'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { Alert, Button, Stack } from '@mui/material'
-import { useForm } from 'react-hook-form'
-import { useLocation, useNavigate } from 'react-router'
+import { Alert, Button, Link as MuiLink, Stack } from '@mui/material'
+import { useForm, useWatch } from 'react-hook-form'
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router'
 import { colors } from '../../../colors'
 import { AuthLayout } from '../components/AuthLayout'
 import { AuthTextField } from '../components/AuthTextField'
@@ -21,12 +21,19 @@ export function LoginScreen() {
   const location = useLocation()
   const loginMutation = useLoginMutation()
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     defaultValues: loginDefaultValues,
     resolver: yupResolver(loginSchema),
+  })
+
+  const emailValue = useWatch({
+    control,
+    name: 'email',
+    defaultValue: loginDefaultValues.email,
   })
 
   const redirectTo =
@@ -70,6 +77,22 @@ export function LoginScreen() {
             registration={register('password')}
             type="password"
           />
+          <Stack sx={{ alignItems: 'flex-end', mt: -0.5 }}>
+            <MuiLink
+              component={RouterLink}
+              state={{ email: emailValue }}
+              to="/forgot-password"
+              underline="hover"
+              sx={{
+                color: colors.primaryContainer,
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                textUnderlineOffset: '0.2em',
+              }}
+            >
+              Forgot password?
+            </MuiLink>
+          </Stack>
           {loginMutation.isError ? (
             <Alert severity="error" variant="outlined">
               {getApiErrorMessage(
