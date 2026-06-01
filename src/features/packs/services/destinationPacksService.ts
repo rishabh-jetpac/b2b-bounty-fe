@@ -1,4 +1,5 @@
 import { apiClient } from '../../../lib/api/client'
+import {BASE_URL} from '../../../../contants'
 import type {
   RevampDestinationItemsResponse,
   RevampDestinationPackApiRecord,
@@ -14,7 +15,7 @@ import {
 } from './revampServiceUtils'
 
 const REVAMP_ITEMS_ENDPOINT =
-  'https://nlb-ap-southeast-1.jetpacstaging.com/v1/b2b/enterprise/catalog/revamp/items'
+  `${BASE_URL}/catalog/revamp/items`
 
 export async function getDestinationPacks(pageName: string) {
   const response = await apiClient.get<RevampDestinationItemsResponse>(REVAMP_ITEMS_ENDPOINT, {

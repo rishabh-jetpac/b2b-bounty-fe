@@ -1,0 +1,1 @@
+export const BASE_URL = import.meta.env.VITE_APP_ENV==='development'?'https://nlb-ap-southeast-1.jetpacstaging.com/v1/b2b/enterprise':'https://nlb-ap-southeast-1.jetpacstaging.com/v1/b2b/enterprise'

@@ -1,10 +1,11 @@
+import { BASE_URL } from '../../../../contants'
 import { apiClient } from '../../../lib/api/client'
 import type { RevampDestinationApiItem, RevampDestinationDirectoryResponse } from '../apiTypes'
 import type { Destination } from '../types'
 import { prettifyDestinationPageName } from '../utils/destinationFormatting'
 
 const REVAMP_DESTINATIONS_ENDPOINT =
-  'http://localhost:8080/v1/b2b/enterprise/catalog/revamp/destinations'
+  `${BASE_URL}/catalog/revamp/destinations`
 
 export async function getDestinations() {
   const response = await apiClient.get<RevampDestinationDirectoryResponse>(
