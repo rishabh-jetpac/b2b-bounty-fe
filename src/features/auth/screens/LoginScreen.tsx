@@ -4,7 +4,7 @@ import LoginIcon from '@mui/icons-material/Login'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { Alert, Button, Link as MuiLink, Stack } from '@mui/material'
 import { useForm, useWatch } from 'react-hook-form'
-import { Link as RouterLink, useLocation, useNavigate } from 'react-router'
+import { Link as RouterLink, useNavigate } from 'react-router'
 import { colors } from '../../../colors'
 import { AuthLayout } from '../components/AuthLayout'
 import { AuthTextField } from '../components/AuthTextField'
@@ -18,7 +18,6 @@ import { getApiErrorMessage } from '../../../lib/api/errors'
 
 export function LoginScreen() {
   const navigate = useNavigate()
-  const location = useLocation()
   const loginMutation = useLoginMutation()
   const {
     control,
@@ -36,18 +35,10 @@ export function LoginScreen() {
     defaultValue: loginDefaultValues.email,
   })
 
-  const redirectTo =
-    location.state &&
-    typeof location.state === 'object' &&
-    'from' in location.state &&
-    typeof location.state.from === 'string'
-      ? location.state.from
-      : '/packs'
-
   const onSubmit = async (values: LoginFormValues) => {
     loginMutation.reset()
     await loginMutation.mutateAsync(values)
-    navigate(redirectTo, { replace: true })
+    navigate('/packs', { replace: true })
   }
 
   return (

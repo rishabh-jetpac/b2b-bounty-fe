@@ -52,10 +52,6 @@ export const router = createBrowserRouter([
         path: '/forgot-password',
         element: <ForgotPasswordRoute />,
       },
-      {
-        path: '/change-password',
-        element: <ChangePasswordRoute />,
-      },
     ],
   },
   {
@@ -83,6 +79,10 @@ export const router = createBrowserRouter([
           {
             path: '/profile',
             element: <ProfileRoute />,
+          },
+          {
+            path: '/change-password',
+            element: <ChangePasswordRoute />,
           },
           {
             path: '/create-subadmin',

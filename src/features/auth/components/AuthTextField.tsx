@@ -5,8 +5,10 @@ import type { ReactNode } from 'react'
 import {
   IconButton,
   InputAdornment,
+  type SxProps,
   Stack,
   TextField,
+  type Theme,
   Typography,
 } from '@mui/material'
 import type { UseFormRegisterReturn } from 'react-hook-form'
@@ -20,6 +22,7 @@ interface AuthTextFieldProps {
   label: string
   placeholder: string
   registration: UseFormRegisterReturn
+  textFieldSx?: SxProps<Theme>
   type?: 'email' | 'password' | 'text'
 }
 
@@ -31,10 +34,21 @@ export function AuthTextField({
   label,
   placeholder,
   registration,
+  textFieldSx,
   type = 'text',
 }: AuthTextFieldProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const isPasswordField = type === 'password'
+  const fieldSx = [
+    {
+      '& .MuiFormHelperText-root': {
+        minHeight: 22,
+        mt: 0.75,
+        mx: 1,
+      },
+    },
+    textFieldSx,
+  ] as SxProps<Theme>
 
   return (
     <Stack spacing={1.1}>
@@ -78,13 +92,7 @@ export function AuthTextField({
           },
         }}
         type={isPasswordField && isPasswordVisible ? 'text' : type}
-        sx={{
-          '& .MuiFormHelperText-root': {
-            minHeight: 22,
-            mt: 0.75,
-            mx: 1,
-          },
-        }}
+        sx={fieldSx}
       />
     </Stack>
   )

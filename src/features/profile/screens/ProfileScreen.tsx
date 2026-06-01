@@ -3,6 +3,7 @@ import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded'
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
 import CurrencyRupeeRoundedIcon from '@mui/icons-material/CurrencyRupeeRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+import LockResetRoundedIcon from '@mui/icons-material/LockResetRounded'
 import PersonAddAlt1OutlinedIcon from '@mui/icons-material/PersonAddAlt1Outlined'
 import {
   Box,
@@ -38,14 +39,14 @@ export function ProfileScreen() {
       value: user?.orgName?.trim() ?? '',
     },
     {
-      icon: <CurrencyRupeeRoundedIcon />,
-      label: 'Base Currency',
-      value: user?.baseCurrency?.trim() ?? '',
-    },
-    {
       icon: <BadgeRoundedIcon />,
       label: 'Role',
       value: formatRoleLabel(user?.role),
+    },
+    {
+      icon: <CurrencyRupeeRoundedIcon />,
+      label: 'Base Currency',
+      value: user?.baseCurrency?.trim() ?? '',
     },
   ].filter((item) => item.value)
 
@@ -60,6 +61,10 @@ export function ProfileScreen() {
 
   function handleCreateSubadmin() {
     navigate('/create-subadmin')
+  }
+
+  function handleResetPassword() {
+    navigate('/change-password')
   }
 
   return (
@@ -92,6 +97,11 @@ export function ProfileScreen() {
         <Typography sx={sectionHeadingSx}>Actions</Typography>
         <Paper elevation={0} sx={groupedCardSx}>
           <Stack divider={<Divider sx={groupedDividerSx} />}>
+            <ActionRow
+              icon={<LockResetRoundedIcon />}
+              label="Reset Password"
+              onClick={handleResetPassword}
+            />
             {isAdmin ? (
               <ActionRow
                 icon={<PersonAddAlt1OutlinedIcon />}

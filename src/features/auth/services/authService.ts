@@ -2,6 +2,7 @@ import axios from 'axios'
 import { BASE_URL } from '../../../../contants'
 import { apiClient } from '../../../lib/api/client'
 import type {
+  ChangePasswordRequest,
   CreateSubadminRequest,
   LoginRequest,
   LoginResponse,
@@ -36,4 +37,8 @@ export async function register(request: RegisterRequest) {
 
 export async function createSubadmin(request: CreateSubadminRequest) {
   await apiClient.post('/api/v1/auth/sub-admins', request)
+}
+
+export async function changePassword(request: ChangePasswordRequest) {
+  await apiClient.post('/auth/change-password', request)
 }

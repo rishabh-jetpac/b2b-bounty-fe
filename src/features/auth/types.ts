@@ -70,6 +70,10 @@ export type CreateSubadminRequest = {
   password: string
 }
 
+export type ChangePasswordRequest = {
+  new_password: string
+}
+
 export type RegisterResponse = {
   data?: {
     message?: string
