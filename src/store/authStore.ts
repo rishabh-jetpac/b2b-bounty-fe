@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { appQueryClient } from '../app/queryClient'
 import type { AuthSession, AuthUser } from '../features/auth/types'
+import { decodeAuthToken } from '../features/auth/utils/authToken'
 
 const authStorageKey = 'jetpac.auth'
 const legacyAccessTokenStorageKey = 'jetpac.accessToken'
@@ -71,8 +72,11 @@ export const useAuthStore = create<AuthState>()(
             user,
           )
         ) {
+          const decodedUser = accessToken ? decodeAuthToken(accessToken) : null
+
           set({
             hydrated: true,
+            user: decodedUser ? { ...user, ...decodedUser } : user,
           })
           return
         }

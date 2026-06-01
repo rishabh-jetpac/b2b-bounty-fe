@@ -1,7 +1,7 @@
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded'
-import { Alert, Box, Button, IconButton, Stack, Typography } from '@mui/material'
+import { Box, Button, IconButton, Stack, Typography } from '@mui/material'
 import { colors } from '../../../colors'
 import { BottomSheet } from './BottomSheet'
 import {
@@ -14,13 +14,11 @@ import type { Pack } from '../types'
 
 type PurchaseSheetProps = {
   destinationTitle: string
-  errorMessage?: string
-  isPending: boolean
   maxQuantity: number
   onClose: () => void
   onDecrease: () => void
+  onCheckout: () => void
   onIncrease: () => void
-  onPurchase: () => void
   open: boolean
   pack: Pack | null
   quantity: number
@@ -28,13 +26,11 @@ type PurchaseSheetProps = {
 
 export function PurchaseSheet({
   destinationTitle,
-  errorMessage,
-  isPending,
   maxQuantity,
   onClose,
   onDecrease,
+  onCheckout,
   onIncrease,
-  onPurchase,
   open,
   pack,
   quantity,
@@ -48,10 +44,10 @@ export function PurchaseSheet({
 
   return (
     <BottomSheet
-      allowBackgroundInteraction={!isPending}
+      allowBackgroundInteraction
       fullWidth
       hideHandle
-      onClose={isPending ? noop : onClose}
+      onClose={onClose}
       open={open}
       showCloseButton={false}
       showHeader={false}
@@ -59,7 +55,6 @@ export function PurchaseSheet({
       <Box sx={{ position: 'relative', pt: 1 }}>
         <IconButton
           aria-label="Close purchase sheet"
-          disabled={isPending}
           onClick={onClose}
           sx={{
             position: 'absolute',
@@ -127,7 +122,7 @@ export function PurchaseSheet({
               >
                 <IconButton
                   aria-label="Decrease quantity"
-                  disabled={isPending || quantity === 1}
+                  disabled={quantity === 1}
                   onClick={onDecrease}
                   sx={stepperButtonSx}
                 >
@@ -146,7 +141,7 @@ export function PurchaseSheet({
                 </Typography>
                 <IconButton
                   aria-label="Increase quantity"
-                  disabled={isPending || quantity >= maxQuantity}
+                  disabled={quantity >= maxQuantity}
                   onClick={onIncrease}
                   sx={stepperButtonSx}
                 >
@@ -156,16 +151,9 @@ export function PurchaseSheet({
             </Box>
           </Stack>
 
-          {errorMessage ? (
-            <Alert severity="error" variant="outlined">
-              {errorMessage}
-            </Alert>
-          ) : null}
-
           <Stack spacing={1}>
             <Button
-              disabled={isPending}
-              onClick={onPurchase}
+              onClick={onCheckout}
               size="large"
               sx={{
                 background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryContainer} 52%, ${colors.primaryContainer} 100%)`,
@@ -176,7 +164,7 @@ export function PurchaseSheet({
               }}
               variant="contained"
             >
-              {isPending ? 'Purchasing...' : 'Buy now'}
+              Checkout
             </Button>
           </Stack>
         </Stack>
@@ -195,5 +183,3 @@ const stepperButtonSx = {
     borderColor: colors.outlineVariant,
   },
 } as const
-
-function noop() {}

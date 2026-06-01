@@ -8,6 +8,7 @@ import {
 } from './AuthGate'
 import CreateAccountRoute from '../routes/CreateAccountRoute'
 import CreateSubadminRoute from '../routes/CreateSubadminRoute'
+import CheckoutRoute from '../routes/CheckoutRoute'
 import HistoryRoute from '../routes/HistoryRoute'
 import InventoryAssignmentRoute from '../routes/InventoryAssignmentRoute'
 import LoginRoute from '../routes/LoginRoute'
@@ -53,6 +54,10 @@ export const router = createBrowserRouter([
       {
         element: <AuthenticatedLayout />,
         children: [
+          {
+            path: '/packs/:pageName/checkout',
+            element: <CheckoutRoute />,
+          },
           {
             path: '/inventory',
             element: <HistoryRoute />,

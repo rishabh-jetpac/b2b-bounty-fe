@@ -55,6 +55,13 @@ export function ProfileScreen() {
       >
         <Stack spacing={1.5}>
           <Box>
+            <Typography sx={fieldLabelSx}>Name</Typography>
+            <Typography sx={fieldValueSx}>{user?.name ?? ''}</Typography>
+          </Box>
+
+          <Divider sx={{ borderColor: colors.outlineVariant }} />
+
+          <Box>
             <Typography sx={fieldLabelSx}>Email</Typography>
             <Typography sx={fieldValueSx}>{user?.email ?? ''}</Typography>
           </Box>
@@ -64,6 +71,13 @@ export function ProfileScreen() {
           <Box>
             <Typography sx={fieldLabelSx}>Organization</Typography>
             <Typography sx={fieldValueSx}>{user?.orgName ?? ''}</Typography>
+          </Box>
+
+          <Divider sx={{ borderColor: colors.outlineVariant }} />
+
+          <Box>
+            <Typography sx={fieldLabelSx}>Base Currency</Typography>
+            <Typography sx={fieldValueSx}>{user?.baseCurrency ?? ''}</Typography>
           </Box>
 
           <Divider sx={{ borderColor: colors.outlineVariant }} />

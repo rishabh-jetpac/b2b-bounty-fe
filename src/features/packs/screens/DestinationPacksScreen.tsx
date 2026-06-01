@@ -1,12 +1,10 @@
-import { Alert, Box, Chip, Snackbar, Stack, Typography } from '@mui/material'
+import { Box, Chip, Stack, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
-import { useMemo, useRef, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router'
-import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate, useOutletContext, useParams } from 'react-router'
+import type { AppShellOutletContext } from '../../../app/useAuthenticatedHeader'
 import { colors } from '../../../colors'
 import { getApiErrorMessage } from '../../../lib/api/errors'
-import { useAuthStore } from '../../../store/authStore'
-import { useWalletQuery } from '../../wallet/hooks/useWalletQuery'
 import { PackCard } from '../components/PackCard'
 import {
   DestinationPacksSkeleton,
@@ -16,7 +14,6 @@ import {
 import { PurchaseSheet } from '../components/PurchaseSheet'
 import { useDestinationDirectoryQuery } from '../hooks/useDestinationDirectoryQuery'
 import { useDestinationPacksQuery } from '../hooks/useDestinationPacksQuery'
-import { usePurchaseMutation } from '../hooks/usePurchaseMutation'
 import type { Pack } from '../types'
 import {
   ALL_DESTINATION_PACKS_FILTER,
@@ -26,23 +23,19 @@ import {
 } from '../utils/destinationPackFilters'
 import { buildDestinationPackSections } from '../utils/destinationPackSections'
 import { prettifyDestinationPageName } from '../utils/destinationFormatting'
+import { navigateBackOrTo } from '../utils/navigation'
 
 const EMPTY_PACKS: Pack[] = []
 const MAX_PACK_PURCHASE_QUANTITY = 20
 
 export function DestinationPacksScreen() {
-  const location = useLocation()
   const navigate = useNavigate()
+  const { setHeader } = useOutletContext<AppShellOutletContext>()
   const { pageName = '' } = useParams()
-  const isAuthenticated = useAuthStore((state) => Boolean(state.accessToken && state.user))
   const destinationDirectoryQuery = useDestinationDirectoryQuery()
   const destinationPacksQuery = useDestinationPacksQuery(pageName)
-  const walletQuery = useWalletQuery({ enabled: isAuthenticated })
-  const purchaseMutation = usePurchaseMutation()
-  const scrollRef = useRef<HTMLDivElement | null>(null)
   const [selectedPack, setSelectedPack] = useState<Pack | null>(null)
   const [quantity, setQuantity] = useState(1)
-  const [purchaseSuccessMessage, setPurchaseSuccessMessage] = useState<string | null>(null)
   const [selectedFilter, setSelectedFilter] = useState<string>(ALL_DESTINATION_PACKS_FILTER)
 
   const packs = destinationPacksQuery.data ?? EMPTY_PACKS
@@ -60,25 +53,21 @@ export function DestinationPacksScreen() {
     destinationDirectoryQuery.data?.find((destination) => destination.pageName === pageName)
       ?.displayName ?? prettifyDestinationPageName(pageName)
 
-  function handleBack() {
-    if (window.history.length > 1) {
-      navigate(-1)
-      return
-    }
+  const handleBack = useCallback(() => {
+    navigateBackOrTo(navigate, '/packs')
+  }, [navigate])
 
-    navigate('/packs')
-  }
-
-  useAuthenticatedHeader({
-    contentPaddingBottom: '0px',
-    leadingAction: {
-      ariaLabel: 'Back to destinations',
-      icon: 'back',
-      onClick: handleBack,
-    },
-    // rightText: walletQuery.data ? formatBalance(balance) : undefined,
-    title: destinationTitle,
-  })
+  useEffect(() => {
+    setHeader({
+      contentPaddingBottom: '0px',
+      leadingAction: {
+        ariaLabel: 'Back to destinations',
+        icon: 'back',
+        onClick: handleBack,
+      },
+      title: destinationTitle,
+    })
+  }, [destinationTitle, handleBack, setHeader])
 
   const packsErrorMessage = destinationPacksQuery.isError
     ? getApiErrorMessage(
@@ -88,19 +77,11 @@ export function DestinationPacksScreen() {
     : ''
 
   function handleSelectPack(pack: Pack, isSelected: boolean) {
-    purchaseMutation.reset()
     setSelectedPack(isSelected ? null : pack)
     setQuantity(1)
   }
 
   function handleClosePurchaseSheet() {
-    purchaseMutation.reset()
-    setSelectedPack(null)
-    setQuantity(1)
-  }
-
-  function resetSelectedPack() {
-    purchaseMutation.reset()
     setSelectedPack(null)
     setQuantity(1)
   }
@@ -109,35 +90,12 @@ export function DestinationPacksScreen() {
     setSelectedFilter(nextFilter)
   }
 
-  async function handlePurchase() {
-    if (!selectedPack || purchaseMutation.isPending) {
+  function handleCheckout() {
+    if (!selectedPack) {
       return
     }
 
-    if (!isAuthenticated) {
-      navigate('/login', {
-        replace: true,
-        state: {
-          from: `${location.pathname}${location.search}${location.hash}`,
-        },
-      })
-      return
-    }
-
-    try {
-      const purchaseResult = await purchaseMutation.mutateAsync({
-        pack_id: selectedPack.id,
-        quantity,
-      })
-
-      resetSelectedPack()
-      setPurchaseSuccessMessage(
-        `Purchased ${purchaseResult.quantity} x ${purchaseResult.packName} successfully.`,
-      )
-      void walletQuery.refetch()
-    } catch {
-      // The mutation state is rendered inline in the purchase sheet.
-    }
+    navigate(`/packs/${pageName}/checkout?packId=${selectedPack.id}&quantity=${quantity}`)
   }
 
   return (
@@ -147,30 +105,29 @@ export function DestinationPacksScreen() {
           height: {
             xs: 'calc(100svh - 58px - 74px - env(safe-area-inset-bottom))',
             sm: 'calc(100svh - 62px - 74px - env(safe-area-inset-bottom))',
-        },
-        minHeight: 0,
-        overflow: 'hidden',
-        backgroundColor: colors.surfaceContainerLowest,
-      }}
-    >
-      <Stack
-        sx={{
-          height: '100%',
+          },
           minHeight: 0,
+          overflow: 'hidden',
           backgroundColor: colors.surfaceContainerLowest,
         }}
       >
-        <Box
-          ref={scrollRef}
+        <Stack
           sx={{
-            position: 'relative',
-            flex: 1,
+            height: '100%',
             minHeight: 0,
-            overflowY: 'auto',
             backgroundColor: colors.surfaceContainerLowest,
-            pb: selectedPack ? { xs: 27, sm: 31 } : { xs: 4, sm: 5 },
           }}
         >
+          <Box
+            sx={{
+              position: 'relative',
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
+              backgroundColor: colors.surfaceContainerLowest,
+              pb: selectedPack ? { xs: 27, sm: 31 } : { xs: 4, sm: 5 },
+            }}
+          >
             {destinationPacksQuery.isPending ? (
               <DestinationPacksSkeleton />
             ) : destinationPacksQuery.isError && packs.length === 0 ? (
@@ -347,44 +304,19 @@ export function DestinationPacksScreen() {
 
       <PurchaseSheet
         destinationTitle={destinationTitle}
-        errorMessage={
-          purchaseMutation.isError
-            ? getApiErrorMessage(
-              purchaseMutation.error,
-                'We could not complete this purchase. Please try again.',
-              )
-            : undefined
-        }
-        isPending={purchaseMutation.isPending}
         maxQuantity={MAX_PACK_PURCHASE_QUANTITY}
         onClose={handleClosePurchaseSheet}
         onDecrease={() => setQuantity((currentQuantity) => Math.max(1, currentQuantity - 1))}
+        onCheckout={handleCheckout}
         onIncrease={() =>
           setQuantity((currentQuantity) =>
             Math.min(MAX_PACK_PURCHASE_QUANTITY, currentQuantity + 1),
           )
         }
-        onPurchase={handlePurchase}
         open={selectedPack !== null}
         pack={selectedPack}
         quantity={quantity}
       />
-
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        autoHideDuration={2500}
-        onClose={() => setPurchaseSuccessMessage(null)}
-        open={purchaseSuccessMessage !== null}
-      >
-        <Alert
-          onClose={() => setPurchaseSuccessMessage(null)}
-          severity="success"
-          sx={{ width: '100%' }}
-          variant="filled"
-        >
-          {purchaseSuccessMessage}
-        </Alert>
-      </Snackbar>
     </>
   )
 }

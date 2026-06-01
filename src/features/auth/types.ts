@@ -1,6 +1,10 @@
 export type AuthUser = {
+  baseCurrency?: string
   email: string
   exp: number
+  firstName?: string
+  lastName?: string
+  name?: string
   orgId: string
   orgName?: string
   role: string
@@ -17,9 +21,13 @@ export type AuthSession = {
 
 export type AuthTokenPayload = {
   access_token: string
+  base_currency?: string
   email: string
   expires_in: number
+  first_name?: string
   organization_id: string
+  org_name?: string
+  last_name?: string
   refresh_token: string
   refresh_token_expires_at: string
   role: string

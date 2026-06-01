@@ -1,7 +1,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import Fuse from 'fuse.js'
 import { Box, Stack } from '@mui/material'
-import { useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
 import { colors } from '../../../colors'
@@ -16,6 +16,7 @@ import {
 import { useDestinationDirectoryQuery } from '../hooks/useDestinationDirectoryQuery'
 import type { Destination } from '../types'
 import { normalizeSearchQuery } from '../utils/destinationFormatting'
+import { navigateBackOrTo } from '../utils/navigation'
 
 const EMPTY_DESTINATIONS: Destination[] = []
 const CARD_HEIGHT = 108
@@ -28,10 +29,24 @@ export function PacksScreen() {
   const [searchQuery, setSearchQuery] = useState('')
   const scrollRef = useRef<HTMLDivElement | null>(null)
 
-  useAuthenticatedHeader({
-    contentPaddingBottom: '0px',
-    title: 'Packs',
-  })
+  const handleBack = useCallback(() => {
+    navigateBackOrTo(navigate, '/')
+  }, [navigate])
+
+  const header = useMemo(
+    () => ({
+      contentPaddingBottom: '0px',
+      leadingAction: {
+        ariaLabel: 'Go back',
+        icon: 'back' as const,
+        onClick: handleBack,
+      },
+      title: 'Packs',
+    }),
+    [handleBack],
+  )
+
+  useAuthenticatedHeader(header)
 
   const destinations = destinationsQuery.data ?? EMPTY_DESTINATIONS
   const normalizedSearch = normalizeSearchQuery(searchQuery)

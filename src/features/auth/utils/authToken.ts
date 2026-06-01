@@ -1,10 +1,14 @@
 import { jwtDecode } from 'jwt-decode'
 import type { AuthSession, AuthUser } from '../types'
+import { buildAuthUserName } from './authUser'
 
 type JwtClaims = {
+  base_currency?: string
   email?: string
   exp?: number
+  first_name?: string
   iat?: number
+  last_name?: string
   organization_id?: string
   organization_type?: string
   org_id?: string
@@ -40,8 +44,12 @@ export function buildAuthSessionFromToken(accessToken: string): AuthSession | nu
       refreshToken: null,
       refreshTokenExpiresAt: null,
       user: {
+        baseCurrency: claims.base_currency,
         email: claims.email,
         exp: claims.exp,
+        firstName: claims.first_name,
+        lastName: claims.last_name,
+        name: buildAuthUserName(claims.first_name, claims.last_name),
         orgId,
         orgName: claims.org_name,
         role: claims.role,

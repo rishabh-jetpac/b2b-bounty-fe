@@ -15,7 +15,6 @@ export type Pack = {
   price: {
     currency: string
     value: string
-    symbol: string
   }
   dataInGB: number
   validityInDays: number
@@ -48,4 +47,8 @@ export type PurchaseResult = {
   quantity: number
   packName: string
   items: PurchasedInventoryItem[]
+}
+
+export type PacksRouteState = {
+  purchaseSuccessMessage?: string
 }

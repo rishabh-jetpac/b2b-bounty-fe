@@ -1,12 +1,13 @@
 import type { Pack } from '../types'
 
 export function formatBalance(amount: number, currency = 'USD') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
+  const normalizedCurrency = currency.trim().toUpperCase() || 'USD'
+  const formattedAmount = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount)
+
+  return `${normalizedCurrency} ${formattedAmount}`
 }
 
 export function formatPackPrice(pack: Pack) {

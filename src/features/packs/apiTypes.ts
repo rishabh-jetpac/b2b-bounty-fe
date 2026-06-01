@@ -1,19 +1,3 @@
-export type PackApiItem = {
-  id: string
-  name: string
-  country_code: string
-  region: string
-  data_gb: number
-  validity_days: number
-  price_usd_cents: number
-  price_usd: number
-  is_active: boolean
-}
-
-export type PacksResponse = {
-  data: PackApiItem[]
-}
-
 export type RevampDestinationApiItem = {
   displayName: string
   pageId: string
@@ -31,11 +15,29 @@ export type RevampDestinationDirectoryResponse = {
   status: string
 }
 
-export type RevampDestinationPackApiRecord = Record<string, unknown>
+export type RevampPackPriceApiItem = {
+  currency?: string
+  listPrice?: number
+  price?: number
+}
 
-export type RevampDestinationItemsResponse =
-  | RevampDestinationPackApiRecord
-  | RevampDestinationPackApiRecord[]
+export type RevampDestinationPackApiItem = {
+  id?: string
+  displayName?: string
+  name?: string
+  title?: string
+  dataInGB?: number
+  validityInDays?: number
+  price?: RevampPackPriceApiItem
+  isActive?: boolean
+}
+
+export type RevampDestinationItemsResponse = {
+  data?: {
+    catalogItem?: RevampDestinationPackApiItem[]
+  }
+  status?: string
+}
 
 export type PurchaseRequest = {
   pack_id: string
