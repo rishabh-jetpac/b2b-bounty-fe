@@ -7,9 +7,9 @@ import jetpacLogo from '../../../assets/images/jetpac_new_logo.png'
 
 interface AuthLayoutProps {
   children: ReactNode
-  footerLinkLabel: string
-  footerLinkPrefix: string
-  footerLinkTo: string
+  footerLinkLabel?: string
+  footerLinkPrefix?: string
+  footerLinkTo?: string
 }
 
 export function AuthLayout({
@@ -18,6 +18,15 @@ export function AuthLayout({
   footerLinkPrefix,
   footerLinkTo,
 }: AuthLayoutProps) {
+  const footerLink =
+    footerLinkLabel && footerLinkPrefix && footerLinkTo
+      ? {
+          label: footerLinkLabel,
+          prefix: footerLinkPrefix,
+          to: footerLinkTo,
+        }
+      : null
+
   return (
     <Box
       sx={{
@@ -69,29 +78,33 @@ export function AuthLayout({
             <Stack spacing={4} sx={{ p: { xs: 3, sm: 4 } }}>
               {children}
 
-              <Divider sx={{ borderColor: colors.outlineVariant }} />
+              {footerLink ? (
+                <>
+                  <Divider sx={{ borderColor: colors.outlineVariant }} />
 
-              <Typography
-                variant="body1"
-                sx={{
-                  color: colors.onSurfaceVariant,
-                  textAlign: 'center',
-                }}
-              >
-                {footerLinkPrefix}{' '}
-                <MuiLink
-                  component={RouterLink}
-                  to={footerLinkTo}
-                  underline="hover"
-                  sx={{
-                    color: colors.primaryContainer,
-                    fontWeight: 700,
-                    textUnderlineOffset: '0.2em',
-                  }}
-                >
-                  {footerLinkLabel}
-                </MuiLink>
-              </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: colors.onSurfaceVariant,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {footerLink.prefix}{' '}
+                    <MuiLink
+                      component={RouterLink}
+                      to={footerLink.to}
+                      underline="hover"
+                      sx={{
+                        color: colors.primaryContainer,
+                        fontWeight: 700,
+                        textUnderlineOffset: '0.2em',
+                      }}
+                    >
+                      {footerLink.label}
+                    </MuiLink>
+                  </Typography>
+                </>
+              ) : null}
             </Stack>
           </Paper>
         </Stack>

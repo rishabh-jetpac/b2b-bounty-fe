@@ -1,98 +1,157 @@
 import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { appQueryClient } from '../app/queryClient'
-import { decodeAuthToken } from '../features/auth/utils/authToken'
-import type { AuthUser } from '../features/auth/types'
+import type { AuthSession, AuthUser } from '../features/auth/types'
 
-const accessTokenStorageKey = 'jetpac.accessToken'
+const authStorageKey = 'jetpac.auth'
+const legacyAccessTokenStorageKey = 'jetpac.accessToken'
 
 type AuthState = {
   accessToken: string | null
+  accessTokenExpiresAt: string | null
+  refreshToken: string | null
+  refreshTokenExpiresAt: string | null
   hydrated: boolean
   initializeAuth: () => void
-  setSessionFromToken: (accessToken: string) => boolean
+  setSession: (session: AuthSession) => void
   clearSession: () => void
   user: AuthUser | null
 }
 
-function persistAccessToken(accessToken: string) {
-  window.localStorage.setItem(accessTokenStorageKey, accessToken)
+function clearLegacyAccessToken() {
+  window.localStorage.removeItem(legacyAccessTokenStorageKey)
 }
 
-function readPersistedAccessToken() {
-  return window.localStorage.getItem(accessTokenStorageKey)
+function hasValidSession(
+  accessToken: string | null,
+  accessTokenExpiresAt: string | null,
+  refreshToken: string | null,
+  refreshTokenExpiresAt: string | null,
+  user: AuthUser | null,
+) {
+  if (!accessToken || !user) {
+    return false
+  }
+
+  const accessTokenIsValid = hasValidTimestamp(accessTokenExpiresAt)
+  const refreshTokenIsValid = refreshToken ? hasValidTimestamp(refreshTokenExpiresAt) : false
+
+  return accessTokenIsValid || refreshTokenIsValid
 }
 
-function clearPersistedAccessToken() {
-  window.localStorage.removeItem(accessTokenStorageKey)
+function hasValidTimestamp(value: string | null) {
+  if (!value) {
+    return false
+  }
+
+  const timestamp = Date.parse(value)
+
+  return Number.isFinite(timestamp) && timestamp > Date.now()
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  accessToken: null,
-  hydrated: false,
-  initializeAuth: () => {
-    const persistedAccessToken = readPersistedAccessToken()
-
-    if (!persistedAccessToken) {
-      set({
-        accessToken: null,
-        hydrated: true,
-        user: null,
-      })
-      return
-    }
-
-    const user = decodeAuthToken(persistedAccessToken)
-
-    if (!user) {
-      clearPersistedAccessToken()
-      set({
-        accessToken: null,
-        hydrated: true,
-        user: null,
-      })
-      return
-    }
-
-    set({
-      accessToken: persistedAccessToken,
-      hydrated: true,
-      user,
-    })
-  },
-  setSessionFromToken: (accessToken) => {
-    const user = decodeAuthToken(accessToken)
-
-    if (!user) {
-      clearPersistedAccessToken()
-      set({
-        accessToken: null,
-        hydrated: true,
-        user: null,
-      })
-      return false
-    }
-
-    persistAccessToken(accessToken)
-    set({
-      accessToken,
-      hydrated: true,
-      user,
-    })
-    return true
-  },
-  clearSession: () => {
-    clearPersistedAccessToken()
-    set({
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
       accessToken: null,
-      hydrated: true,
+      accessTokenExpiresAt: null,
+      refreshToken: null,
+      refreshTokenExpiresAt: null,
+      hydrated: false,
+      initializeAuth: () => {
+        clearLegacyAccessToken()
+
+        const { accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, user } = get()
+
+        if (
+          hasValidSession(
+            accessToken,
+            accessTokenExpiresAt,
+            refreshToken,
+            refreshTokenExpiresAt,
+            user,
+          )
+        ) {
+          set({
+            hydrated: true,
+          })
+          return
+        }
+
+        set({
+          accessToken: null,
+          accessTokenExpiresAt: null,
+          refreshToken: null,
+          refreshTokenExpiresAt: null,
+          hydrated: true,
+          user: null,
+        })
+      },
+      setSession: ({
+        accessToken,
+        accessTokenExpiresAt,
+        refreshToken,
+        refreshTokenExpiresAt,
+        user,
+      }) => {
+        set({
+          accessToken,
+          accessTokenExpiresAt,
+          refreshToken,
+          refreshTokenExpiresAt,
+          hydrated: true,
+          user,
+        })
+      },
+      clearSession: () => {
+        set({
+          accessToken: null,
+          accessTokenExpiresAt: null,
+          refreshToken: null,
+          refreshTokenExpiresAt: null,
+          hydrated: true,
+          user: null,
+        })
+      },
       user: null,
-    })
-  },
-  user: null,
-}))
+    }),
+    {
+      name: authStorageKey,
+      storage: createJSONStorage(() => window.localStorage),
+      partialize: (state) => ({
+        accessToken: state.accessToken,
+        accessTokenExpiresAt: state.accessTokenExpiresAt,
+        refreshToken: state.refreshToken,
+        refreshTokenExpiresAt: state.refreshTokenExpiresAt,
+        user: state.user,
+      }),
+    },
+  ),
+)
 
 export function getAccessToken() {
   return useAuthStore.getState().accessToken
+}
+
+export function getAuthSessionSnapshot() {
+  const {
+    accessToken,
+    accessTokenExpiresAt,
+    refreshToken,
+    refreshTokenExpiresAt,
+    user,
+  } = useAuthStore.getState()
+
+  return {
+    accessToken,
+    accessTokenExpiresAt,
+    refreshToken,
+    refreshTokenExpiresAt,
+    user,
+  }
+}
+
+export function setAuthSession(session: AuthSession) {
+  useAuthStore.getState().setSession(session)
 }
 
 export function clearAuthSession() {

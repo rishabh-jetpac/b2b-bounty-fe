@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { CircularProgress, Stack } from '@mui/material'
 import { Navigate, Outlet, useLocation } from 'react-router'
 import { colors } from '../colors'
+import { hasAdminAccess } from '../features/auth/utils/authRoles'
 import { useAuthStore } from '../store/authStore'
 
 function AuthGateLoader() {
@@ -88,7 +89,7 @@ export function AdminOnlyRoute({ children }: AdminOnlyRouteProps) {
     return <Navigate replace state={{ from }} to="/login" />
   }
 
-  if (user?.role !== 'admin') {
+  if (!hasAdminAccess(user?.role)) {
     return <Navigate replace to="/packs" />
   }
 

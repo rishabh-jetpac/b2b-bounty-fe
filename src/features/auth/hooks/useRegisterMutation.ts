@@ -2,9 +2,10 @@ import { useMutation } from '@tanstack/react-query'
 import { useAuthStore } from '../../../store/authStore'
 import { register } from '../services/authService'
 import type { RegisterRequest } from '../types'
+import { buildAuthSessionFromToken } from '../utils/authToken'
 
 export function useRegisterMutation() {
-  const setSessionFromToken = useAuthStore((state) => state.setSessionFromToken)
+  const setSession = useAuthStore((state) => state.setSession)
 
   return useMutation({
     mutationFn: async (registration: RegisterRequest) => {
@@ -12,11 +13,13 @@ export function useRegisterMutation() {
       const accessToken = response.data?.token
 
       if (accessToken) {
-        const didPersistSession = setSessionFromToken(accessToken)
+        const session = buildAuthSessionFromToken(accessToken)
 
-        if (!didPersistSession) {
+        if (!session) {
           throw new Error('The registration token could not be processed.')
         }
+
+        setSession(session)
       }
 
       return response

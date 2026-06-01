@@ -13,11 +13,12 @@ import { useNavigate } from 'react-router'
 import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
 import { colors } from '../../../colors'
 import { clearAuthSession, useAuthStore } from '../../../store/authStore'
+import { hasAdminAccess } from '../../auth/utils/authRoles'
 
 export function ProfileScreen() {
   const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
-  const isAdmin = user?.role === 'admin'
+  const isAdmin = hasAdminAccess(user?.role)
 
   useAuthenticatedHeader({
     title: 'Profile',

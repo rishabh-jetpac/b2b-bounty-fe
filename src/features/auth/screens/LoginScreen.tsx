@@ -45,9 +45,9 @@ export function LoginScreen() {
 
   return (
     <AuthLayout
-      footerLinkLabel="Create Account"
-      footerLinkPrefix="New here?"
-      footerLinkTo="/create-account"
+      // footerLinkLabel="Create Account"
+      // footerLinkPrefix="New here?"
+      // footerLinkTo="/create-account"
     >
       <Stack component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={1.1}>
