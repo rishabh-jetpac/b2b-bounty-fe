@@ -12,7 +12,7 @@ import {
 import { PacksStateCard } from './PacksStateCard'
 
 export type CheckoutContentProps = {
-  balanceUsd: number | null
+  balance: number | null
   canDecreaseQuantity: boolean
   canIncreaseQuantity: boolean
   confirmDisabled: boolean
@@ -27,6 +27,7 @@ export type CheckoutContentProps = {
   pack: Pack
   purchaseErrorMessage: string | null
   quantity: number
+  walletCurrency: string | null
   walletUnavailableMessage: string | null
 }
 
@@ -48,7 +49,7 @@ type CheckoutStateContainerProps = {
 }
 
 export function CheckoutContent({
-  balanceUsd,
+  balance,
   canDecreaseQuantity,
   canIncreaseQuantity,
   confirmDisabled,
@@ -63,11 +64,12 @@ export function CheckoutContent({
   pack,
   purchaseErrorMessage,
   quantity,
+  walletCurrency,
   walletUnavailableMessage,
 }: CheckoutContentProps) {
   const unitPrice = getPackPriceValue(pack)
   const totalDeduction = unitPrice * quantity
-  const balanceAfterDeduction = balanceUsd === null ? null : balanceUsd - totalDeduction
+  const balanceAfterDeduction = balance === null ? null : balance - totalDeduction
 
   return (
     <Stack sx={checkoutContentSx}>
@@ -85,12 +87,13 @@ export function CheckoutContent({
 
           <CheckoutSummaryCard
             balanceAfterDeduction={balanceAfterDeduction}
-            currentWalletBalance={balanceUsd}
+            currentWalletBalance={balance}
             hasInsufficientBalance={hasInsufficientBalance}
+            packCurrency={pack.price.currency}
             quantity={quantity}
             totalDeduction={totalDeduction}
             unitPrice={unitPrice}
-            currency={pack.price.currency}
+            walletCurrency={walletCurrency}
           />
 
           <CheckoutStatusAlerts

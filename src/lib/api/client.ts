@@ -1,4 +1,5 @@
 import axios, { AxiosHeaders, type InternalAxiosRequestConfig } from 'axios'
+import { BASE_URL } from '../../../contants'
 import { refreshAccessToken } from '../../features/auth/services/authService'
 import { createAuthSessionFromResponse } from '../../features/auth/utils/authSession'
 import {
@@ -8,12 +9,8 @@ import {
   setAuthSession,
 } from '../../store/authStore'
 
-function getApiBaseUrl() {
-  return import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/+$/, '') ?? ''
-}
-
 export const apiClient = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -27,9 +24,9 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
 
 function isAuthRequest(url: string) {
   return (
-    url.includes('/auth/login') ||
-    url.includes('/auth/register') ||
-    url.includes('/auth/refresh')
+    url.includes('auth/login') ||
+    url.includes('auth/register') ||
+    url.includes('auth/refresh')
   )
 }
 

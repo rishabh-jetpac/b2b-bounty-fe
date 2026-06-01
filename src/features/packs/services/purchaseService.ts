@@ -3,10 +3,7 @@ import type { PurchaseRequest, PurchaseResponse } from '../apiTypes'
 import type { PurchaseResult } from '../types'
 
 export async function purchasePack(request: PurchaseRequest): Promise<PurchaseResult> {
-  const response = await apiClient.post<PurchaseResponse>(
-    '/api/v1/inventory/purchase',
-    request,
-  )
+  const response = await apiClient.post<PurchaseResponse>('inventory/purchase', request)
 
   return {
     quantity: response.data.data.quantity,

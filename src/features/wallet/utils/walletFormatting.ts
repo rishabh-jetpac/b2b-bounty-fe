@@ -12,13 +12,15 @@ const walletTransactionDateFormatter = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
 })
 
-export function formatWalletCurrency(amount: number, currency = 'USD') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
+export function formatWalletCurrency(amount: number, currency: string) {
+  const normalizedCurrency = currency.trim().toUpperCase() || 'USD'
+
+  const formattedAmount = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount)
+
+  return `${normalizedCurrency} ${formattedAmount}`
 }
 
 export function formatWalletUpdatedAt(value: string) {
@@ -28,7 +30,7 @@ export function formatWalletUpdatedAt(value: string) {
 export function formatWalletTransactionAmount(
   amount: number,
   type: 'debit' | 'credit',
-  currency = 'USD',
+  currency: string,
 ) {
   const sign = type === 'credit' ? '+' : '-'
 

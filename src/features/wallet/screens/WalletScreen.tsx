@@ -1,12 +1,9 @@
-import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import {
-  Alert,
   Button,
   Chip,
   CircularProgress,
-  IconButton,
   Paper,
-  Snackbar,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material'
@@ -16,7 +13,6 @@ import { useAuthenticatedHeader } from '../../../app/useAuthenticatedHeader'
 import { PullToRefreshContainer } from '../../../components/PullToRefreshContainer'
 import { colors } from '../../../colors'
 import { getApiErrorMessage } from '../../../lib/api/errors'
-import { WalletTopUpDialog } from '../components/WalletTopUpDialog'
 import { useWalletQuery } from '../hooks/useWalletQuery'
 import { useWalletTransactionsQuery } from '../hooks/useWalletTransactionsQuery'
 import type { WalletTransaction, WalletTransactionType } from '../types'
@@ -33,8 +29,6 @@ export function WalletScreen() {
   const walletTransactionsQuery = useWalletTransactionsQuery()
   const [transactionFilter, setTransactionFilter] =
     useState<TransactionHistoryFilter>('all')
-  const [isTopUpDialogOpen, setIsTopUpDialogOpen] = useState(false)
-  const [topUpSuccessMessage, setTopUpSuccessMessage] = useState<string | null>(null)
 
   useAuthenticatedHeader({
     title: 'Wallet',
@@ -88,10 +82,7 @@ export function WalletScreen() {
 
   return (
     <>
-      <PullToRefreshContainer
-        isPullable={!isTopUpDialogOpen}
-        onRefresh={handleRefresh}
-      >
+      <PullToRefreshContainer onRefresh={handleRefresh}>
         <Stack spacing={2.25}>
           <Paper
             elevation={0}
@@ -138,25 +129,8 @@ export function WalletScreen() {
                     lineHeight: 1.15,
                   }}
                 >
-                  {formatWalletCurrency(wallet.balanceUsd)}
+                  {formatWalletCurrency(wallet.balance, wallet.currency)}
                 </Typography>
-                <IconButton
-                  aria-label="Top up wallet"
-                  onClick={() => setIsTopUpDialogOpen(true)}
-                  sx={{
-                    width: 42,
-                    height: 42,
-                    flexShrink: 0,
-                    color: colors.onPrimary,
-                    backgroundColor: alpha(colors.onPrimary, 0.16),
-                    border: `1px solid ${alpha(colors.onPrimary, 0.22)}`,
-                    '&:hover': {
-                      backgroundColor: alpha(colors.onPrimary, 0.24),
-                    },
-                  }}
-                >
-                  <AddRoundedIcon />
-                </IconButton>
               </Stack>
               <Typography
                 variant="body2"
@@ -249,31 +223,6 @@ export function WalletScreen() {
           </Stack>
         </Stack>
       </PullToRefreshContainer>
-
-      <WalletTopUpDialog
-        onClose={() => setIsTopUpDialogOpen(false)}
-        onSuccess={(message) => {
-          setIsTopUpDialogOpen(false)
-          setTopUpSuccessMessage(message)
-        }}
-        open={isTopUpDialogOpen}
-      />
-
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        autoHideDuration={2500}
-        onClose={() => setTopUpSuccessMessage(null)}
-        open={topUpSuccessMessage !== null}
-      >
-        <Alert
-          onClose={() => setTopUpSuccessMessage(null)}
-          severity="success"
-          sx={{ width: '100%' }}
-          variant="filled"
-        >
-          {topUpSuccessMessage}
-        </Alert>
-      </Snackbar>
     </>
   )
 }
@@ -282,25 +231,72 @@ type TransactionHistoryFilter = 'all' | WalletTransactionType
 
 function LoadingState() {
   return (
-    <Paper elevation={0} sx={stateCardSx}>
-      <Stack
-        spacing={1.5}
+    <Stack spacing={2.25}>
+      <Paper
+        elevation={0}
         sx={{
-          minHeight: 220,
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
+          overflow: 'hidden',
+          minHeight: { xs: 108, sm: 118 },
+          borderRadius: '8px',
+          px: 2.5,
+          py: 2,
+          background: `linear-gradient(135deg, ${colors.primaryContainer} 0%, ${colors.primary} 100%)`,
+          color: colors.onPrimary,
+          boxShadow: `0 16px 32px ${alpha(colors.primary, 0.2)}`,
         }}
       >
-        <CircularProgress size={28} />
-        <Typography variant="h3" sx={{ color: colors.onSurface }}>
-          Loading wallet
-        </Typography>
-        <Typography sx={{ color: colors.onSurfaceVariant }}>
-          Fetching the latest wallet balance for this account.
-        </Typography>
+        <Stack spacing={1.1}>
+          <Skeleton
+            animation="wave"
+            height={18}
+            sx={{
+              borderRadius: 1,
+              bgcolor: alpha(colors.onPrimary, 0.24),
+              transform: 'none',
+            }}
+            width={88}
+          />
+          <Skeleton
+            animation="wave"
+            height={44}
+            sx={{
+              borderRadius: 1,
+              bgcolor: alpha(colors.onPrimary, 0.28),
+              transform: 'none',
+            }}
+            width="56%"
+          />
+          <Skeleton
+            animation="wave"
+            height={18}
+            sx={{
+              borderRadius: 1,
+              bgcolor: alpha(colors.onPrimary, 0.22),
+              transform: 'none',
+            }}
+            width="42%"
+          />
+        </Stack>
+      </Paper>
+
+      <Stack spacing={1.25}>
+        <Skeleton animation="wave" height={24} sx={{ borderRadius: 1 }} width={148} />
+        {[0, 1, 2].map((item) => (
+          <Paper elevation={0} key={item} sx={stateCardSx}>
+            <Stack spacing={1.1}>
+              <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+                <Skeleton animation="wave" height={22} sx={{ borderRadius: 1 }} width="42%" />
+                <Skeleton animation="wave" height={22} sx={{ borderRadius: 1 }} width={92} />
+              </Stack>
+              <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+                <Skeleton animation="wave" height={18} sx={{ borderRadius: 1 }} width={84} />
+                <Skeleton animation="wave" height={18} sx={{ borderRadius: 1 }} width={74} />
+              </Stack>
+            </Stack>
+          </Paper>
+        ))}
       </Stack>
-    </Paper>
+    </Stack>
   )
 }
 
@@ -359,7 +355,11 @@ function TransactionCard({ transaction }: TransactionCardProps) {
               lineHeight: 1.35,
             }}
           >
-            {formatWalletTransactionAmount(transaction.amountUsd, transaction.type)}
+            {formatWalletTransactionAmount(
+              transaction.amount,
+              transaction.type,
+              transaction.currency,
+            )}
           </Typography>
         </Stack>
 

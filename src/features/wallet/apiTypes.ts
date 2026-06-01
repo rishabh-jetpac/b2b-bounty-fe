@@ -1,8 +1,6 @@
 export type WalletApiItem = {
-  id: string
-  org_id: string
-  balance_usd_cents: number
-  balance_usd: number
+  balance_minor_units: number
+  currency?: string
   updated_at: string
 }
 
@@ -12,21 +10,14 @@ export type WalletResponse = {
 
 export type WalletTransactionApiItem = {
   id: string
-  org_id: string
   type: 'debit' | 'credit'
-  amount_cents: number
-  reason: string | Record<string, number>
+  amount_minor_units: number
+  currency?: string
   created_at: string
 }
 
 export type WalletTransactionsResponse = {
-  data: WalletTransactionApiItem[]
-}
-
-export type WalletTopUpApiItem = {
-  message: string
-}
-
-export type WalletTopUpResponse = {
-  data: WalletTopUpApiItem
+  data: {
+    transactions: WalletTransactionApiItem[]
+  }
 }

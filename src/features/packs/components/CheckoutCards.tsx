@@ -36,11 +36,12 @@ type CheckoutStatusAlertsProps = {
 type CheckoutSummaryCardProps = {
   balanceAfterDeduction: number | null
   currentWalletBalance: number | null
-  currency: string
   hasInsufficientBalance: boolean
+  packCurrency: string
   quantity: number
   totalDeduction: number
   unitPrice: number
+  walletCurrency: string | null
 }
 
 type SummaryRowProps = {
@@ -190,12 +191,15 @@ export function CheckoutPackCard({
 export function CheckoutSummaryCard({
   balanceAfterDeduction,
   currentWalletBalance,
-  currency,
   hasInsufficientBalance,
+  packCurrency,
   quantity,
   totalDeduction,
   unitPrice,
+  walletCurrency,
 }: CheckoutSummaryCardProps) {
+  const displayWalletCurrency = walletCurrency ?? packCurrency
+
   return (
     <Paper
       elevation={0}
@@ -217,13 +221,13 @@ export function CheckoutSummaryCard({
             value={
               currentWalletBalance === null
                 ? 'Unavailable'
-                : formatBalance(currentWalletBalance, currency)
+                : formatBalance(currentWalletBalance, displayWalletCurrency)
             }
             valueMuted={currentWalletBalance === null}
           />
           <SummaryRow
-            label={`Pack Price (${formatBalance(unitPrice, currency)} x ${quantity})`}
-            value={formatBalance(totalDeduction, currency)}
+            label={`Pack Price (${formatBalance(unitPrice, packCurrency)} x ${quantity})`}
+            value={formatBalance(totalDeduction, packCurrency)}
           />
         </Stack>
 
@@ -236,7 +240,7 @@ export function CheckoutSummaryCard({
           <SummaryRow
             emphasized
             label="Total Deduction"
-            value={`- ${formatBalance(totalDeduction, currency)}`}
+            value={`- ${formatBalance(totalDeduction, packCurrency)}`}
             valueColor={colors.error}
           />
         </Box>
@@ -290,7 +294,7 @@ export function CheckoutSummaryCard({
             >
               {balanceAfterDeduction === null
                 ? 'Unavailable'
-                : formatBalance(balanceAfterDeduction, currency)}
+                : formatBalance(balanceAfterDeduction, displayWalletCurrency)}
             </Typography>
             {balanceAfterDeduction === null ? null : <EastRoundedIcon sx={{ fontSize: 22 }} />}
           </Stack>

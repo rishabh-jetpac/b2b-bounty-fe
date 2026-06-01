@@ -7,7 +7,7 @@ import type {
 import type { InventoryItem } from '../types'
 
 export async function getInventory() {
-  const response = await apiClient.get<InventoryResponse>('/api/v1/inventory')
+  const response = await apiClient.get<InventoryResponse>('inventory')
   return response.data.data.map(mapInventoryItem)
 }
 
@@ -15,7 +15,7 @@ export async function reassignInventoryItem(
   inventoryId: string,
   request: InventoryAssignRequest,
 ) {
-  await apiClient.put(`/api/v1/inventory/${encodeURIComponent(inventoryId)}/assign`, request)
+  await apiClient.put(`inventory/${encodeURIComponent(inventoryId)}/assign`, request)
 }
 
 export async function assignInventoryItemToRecipient(
@@ -23,7 +23,7 @@ export async function assignInventoryItemToRecipient(
   request: InventoryAssignRequest,
 ) {
   await apiClient.post(
-    `/api/v1/inventory/packs/${encodeURIComponent(packId)}/assign`,
+    `inventory/packs/${encodeURIComponent(packId)}/assign`,
     request,
   )
 }

@@ -1,8 +1,7 @@
 export type Wallet = {
-  id: string
-  orgId: string
-  balanceUsdCents: number
-  balanceUsd: number
+  balance: number
+  balanceMinorUnits: number
+  currency: string
   updatedAt: string
 }
 
@@ -10,15 +9,10 @@ export type WalletTransactionType = 'debit' | 'credit'
 
 export type WalletTransaction = {
   id: string
-  orgId: string
   type: WalletTransactionType
-  amountUsdCents: number
-  amountUsd: number
-  reason: string | Record<string, number>
+  amount: number
+  amountMinorUnits: number
+  currency: string
   title: string
   createdAt: string
-}
-
-export type WalletTopUpRequest = {
-  amountUsd: number
 }

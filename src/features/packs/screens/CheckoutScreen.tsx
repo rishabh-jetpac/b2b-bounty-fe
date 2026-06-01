@@ -149,7 +149,7 @@ export function CheckoutScreen() {
   const hasInsufficientBalance =
     wallet === undefined
       ? false
-      : wallet.balanceUsd - getPackPriceValue(pack) * quantity < 0
+      : wallet.balance - getPackPriceValue(pack) * quantity < 0
   const purchaseErrorMessage = purchaseMutation.isError
     ? getApiErrorMessage(
         purchaseMutation.error,
@@ -159,7 +159,7 @@ export function CheckoutScreen() {
 
   return (
     <CheckoutContent
-      balanceUsd={wallet?.balanceUsd ?? null}
+      balance={wallet?.balance ?? null}
       canDecreaseQuantity={!purchaseMutation.isPending && quantity > 1}
       canIncreaseQuantity={
         !purchaseMutation.isPending && quantity < MAX_PACK_PURCHASE_QUANTITY
@@ -178,6 +178,7 @@ export function CheckoutScreen() {
       pack={pack}
       purchaseErrorMessage={purchaseErrorMessage}
       quantity={quantity}
+      walletCurrency={wallet?.currency ?? null}
       walletUnavailableMessage={walletUnavailableMessage}
     />
   )

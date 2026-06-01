@@ -12,11 +12,11 @@ import type {
   RegisterResponse,
 } from '../types'
 
-const ENTERPRISE_LOGIN_ENDPOINT = `${BASE_URL}/auth/login`
+const ENTERPRISE_REGISTER_ENDPOINT = `${BASE_URL}/auth/register`
 const ENTERPRISE_REFRESH_ENDPOINT = `${BASE_URL}/auth/refresh`
 
 export async function login(request: LoginRequest) {
-  const response = await apiClient.post<LoginResponse>(ENTERPRISE_LOGIN_ENDPOINT, request)
+  const response = await apiClient.post<LoginResponse>('auth/login', request)
   return response.data
 }
 
@@ -31,14 +31,14 @@ export async function refreshAccessToken(request: RefreshRequest) {
 }
 
 export async function register(request: RegisterRequest) {
-  const response = await apiClient.post<RegisterResponse>('/auth/register', request)
+  const response = await apiClient.post<RegisterResponse>(ENTERPRISE_REGISTER_ENDPOINT, request)
   return response.data
 }
 
 export async function createSubadmin(request: CreateSubadminRequest) {
-  await apiClient.post('/api/v1/auth/sub-admins', request)
+  await apiClient.post('auth/sub-admins', request)
 }
 
 export async function changePassword(request: ChangePasswordRequest) {
-  await apiClient.post('/auth/change-password', request)
+  await apiClient.post('auth/change-password', request)
 }
