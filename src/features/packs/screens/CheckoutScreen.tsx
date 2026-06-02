@@ -178,6 +178,7 @@ export function CheckoutScreen() {
       pack={pack}
       purchaseErrorMessage={purchaseErrorMessage}
       quantity={quantity}
+      walletBalanceIsLoading={walletQuery.isPending}
       walletCurrency={wallet?.currency ?? null}
       walletUnavailableMessage={walletUnavailableMessage}
     />

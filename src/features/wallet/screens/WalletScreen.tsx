@@ -1,7 +1,6 @@
 import {
   Button,
   Chip,
-  CircularProgress,
   Paper,
   Skeleton,
   Stack,
@@ -51,7 +50,10 @@ export function WalletScreen() {
 
   if (walletQuery.isError || !walletQuery.data) {
     return (
-      <PullToRefreshContainer onRefresh={handleRefresh}>
+      <PullToRefreshContainer
+        backgroundColor={colors.surfaceContainerLowest}
+        onRefresh={handleRefresh}
+      >
         <StateCard
           action={
             <Button
@@ -82,29 +84,24 @@ export function WalletScreen() {
 
   return (
     <>
-      <PullToRefreshContainer onRefresh={handleRefresh}>
+      <PullToRefreshContainer
+        backgroundColor={colors.surfaceContainerLowest}
+        onRefresh={handleRefresh}
+      >
         <Stack spacing={2.25}>
           <Paper
             elevation={0}
             sx={{
-              position: 'relative',
               overflow: 'hidden',
               minHeight: { xs: 108, sm: 118 },
-              borderRadius: '8px',
+              borderRadius: 1.5,
               px: 2.5,
               py: 2,
               background: `linear-gradient(135deg, ${colors.primaryContainer} 0%, ${colors.primary} 100%)`,
               color: colors.onPrimary,
-              boxShadow: `0 16px 32px ${alpha(colors.primary, 0.2)}`,
             }}
           >
-            <Stack
-              spacing={0.9}
-              sx={{
-                position: 'relative',
-                zIndex: 1,
-              }}
-            >
+            <Stack spacing={0.9}>
               <Typography
                 variant="overline"
                 sx={{
@@ -237,12 +234,11 @@ function LoadingState() {
         sx={{
           overflow: 'hidden',
           minHeight: { xs: 108, sm: 118 },
-          borderRadius: '8px',
+          borderRadius: 1.5,
           px: 2.5,
           py: 2,
           background: `linear-gradient(135deg, ${colors.primaryContainer} 0%, ${colors.primary} 100%)`,
           color: colors.onPrimary,
-          boxShadow: `0 16px 32px ${alpha(colors.primary, 0.2)}`,
         }}
       >
         <Stack spacing={1.1}>
@@ -251,7 +247,7 @@ function LoadingState() {
             height={18}
             sx={{
               borderRadius: 1,
-              bgcolor: alpha(colors.onPrimary, 0.24),
+              bgcolor: alpha(colors.onSurface, 0.08),
               transform: 'none',
             }}
             width={88}
@@ -261,7 +257,7 @@ function LoadingState() {
             height={44}
             sx={{
               borderRadius: 1,
-              bgcolor: alpha(colors.onPrimary, 0.28),
+              bgcolor: alpha(colors.onSurface, 0.1),
               transform: 'none',
             }}
             width="56%"
@@ -271,7 +267,7 @@ function LoadingState() {
             height={18}
             sx={{
               borderRadius: 1,
-              bgcolor: alpha(colors.onPrimary, 0.22),
+              bgcolor: alpha(colors.onSurface, 0.08),
               transform: 'none',
             }}
             width="42%"
@@ -302,14 +298,22 @@ function LoadingState() {
 
 function LoadingHistoryState() {
   return (
-    <Paper elevation={0} sx={stateCardSx}>
-      <Stack spacing={1.25} sx={{ alignItems: 'center', py: 1.5, textAlign: 'center' }}>
-        <CircularProgress size={24} />
-        <Typography variant="body2" sx={{ color: colors.onSurfaceVariant }}>
-          Fetching the latest wallet transactions.
-        </Typography>
-      </Stack>
-    </Paper>
+    <Stack spacing={1.25}>
+      {[0, 1, 2].map((item) => (
+        <Paper elevation={0} key={item} sx={stateCardSx}>
+          <Stack spacing={1.1}>
+            <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+              <Skeleton animation="wave" height={22} sx={{ borderRadius: 1 }} width="44%" />
+              <Skeleton animation="wave" height={22} sx={{ borderRadius: 1 }} width={88} />
+            </Stack>
+            <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+              <Skeleton animation="wave" height={18} sx={{ borderRadius: 1 }} width={86} />
+              <Skeleton animation="wave" height={18} sx={{ borderRadius: 1 }} width={72} />
+            </Stack>
+          </Stack>
+        </Paper>
+      ))}
+    </Stack>
   )
 }
 
@@ -325,7 +329,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
     <Paper
       elevation={0}
       sx={{
-        borderRadius: '8px',
+        borderRadius: 1.5,
         border: `1px solid ${colors.outlineVariant}`,
         px: 2,
         py: 1.75,
@@ -450,7 +454,7 @@ function getTransactionFilterChipSx(isActive: boolean) {
 }
 
 const stateCardSx = {
-  borderRadius: '8px',
+  borderRadius: 1.5,
   border: `1px solid ${colors.outlineVariant}`,
   px: 2.5,
   py: 3,

@@ -27,6 +27,7 @@ export type CheckoutContentProps = {
   pack: Pack
   purchaseErrorMessage: string | null
   quantity: number
+  walletBalanceIsLoading: boolean
   walletCurrency: string | null
   walletUnavailableMessage: string | null
 }
@@ -64,6 +65,7 @@ export function CheckoutContent({
   pack,
   purchaseErrorMessage,
   quantity,
+  walletBalanceIsLoading,
   walletCurrency,
   walletUnavailableMessage,
 }: CheckoutContentProps) {
@@ -93,6 +95,7 @@ export function CheckoutContent({
             quantity={quantity}
             totalDeduction={totalDeduction}
             unitPrice={unitPrice}
+            walletBalanceIsLoading={walletBalanceIsLoading}
             walletCurrency={walletCurrency}
           />
 

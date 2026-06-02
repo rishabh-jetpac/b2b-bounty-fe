@@ -4,12 +4,14 @@ import PullToRefresh from 'react-simple-pull-to-refresh'
 import { colors } from '../colors'
 
 type PullToRefreshContainerProps = {
+  backgroundColor?: string
   children: ReactElement
   isPullable?: boolean
   onRefresh: () => Promise<unknown>
 }
 
 export function PullToRefreshContainer({
+  backgroundColor = colors.background,
   children,
   isPullable = true,
   onRefresh,
@@ -17,12 +19,13 @@ export function PullToRefreshContainer({
   return (
     <Box
       sx={{
+        backgroundColor,
         height: '100%',
         minHeight: 0,
       }}
     >
       <PullToRefresh
-        backgroundColor={colors.background}
+        backgroundColor={backgroundColor}
         className="pull-to-refresh-container"
         isPullable={isPullable}
         maxPullDownDistance={92}
@@ -34,6 +37,7 @@ export function PullToRefreshContainer({
       >
         <Box
           sx={{
+            backgroundColor,
             height: '100%',
             minHeight: 0,
           }}

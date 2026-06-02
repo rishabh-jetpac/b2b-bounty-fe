@@ -1,5 +1,4 @@
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
-import EastRoundedIcon from '@mui/icons-material/EastRounded'
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded'
 import {
   Alert,
@@ -7,10 +6,12 @@ import {
   Button,
   IconButton,
   Paper,
+  Skeleton,
   Stack,
   Typography,
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
+import type { ReactNode } from 'react'
 import { colors } from '../../../colors'
 import type { Pack } from '../types'
 import { formatBalance, formatValidity, getPackPriceValue } from '../utils/packFormatting'
@@ -41,13 +42,14 @@ type CheckoutSummaryCardProps = {
   quantity: number
   totalDeduction: number
   unitPrice: number
+  walletBalanceIsLoading: boolean
   walletCurrency: string | null
 }
 
 type SummaryRowProps = {
   emphasized?: boolean
   label: string
-  value: string
+  value: ReactNode
   valueColor?: string
   valueMuted?: boolean
 }
@@ -196,6 +198,7 @@ export function CheckoutSummaryCard({
   quantity,
   totalDeduction,
   unitPrice,
+  walletBalanceIsLoading,
   walletCurrency,
 }: CheckoutSummaryCardProps) {
   const displayWalletCurrency = walletCurrency ?? packCurrency
@@ -210,7 +213,7 @@ export function CheckoutSummaryCard({
         backgroundColor: colors.surfaceContainerLowest
       }}
     >
-      <Stack spacing={1.75} sx={{ px: { xs: 2, sm: 2.5 }, py: 2 }}>
+      <Stack spacing={1.75} sx={{ px: { xs: 2, sm: 2.5 }, py: 1}}>
         <Typography variant="overline" sx={sectionOverlineSx}>
           Transaction Summary
         </Typography>
@@ -219,11 +222,15 @@ export function CheckoutSummaryCard({
           <SummaryRow
             label="Current Wallet Balance"
             value={
-              currentWalletBalance === null
-                ? 'Unavailable'
-                : formatBalance(currentWalletBalance, displayWalletCurrency)
+              walletBalanceIsLoading ? (
+                <AmountSkeleton />
+              ) : currentWalletBalance === null ? (
+                'Unavailable'
+              ) : (
+                formatBalance(currentWalletBalance, displayWalletCurrency)
+              )
             }
-            valueMuted={currentWalletBalance === null}
+            valueMuted={walletBalanceIsLoading || currentWalletBalance === null}
           />
           <SummaryRow
             label={`Pack Price (${formatBalance(unitPrice, packCurrency)} x ${quantity})`}
@@ -251,7 +258,7 @@ export function CheckoutSummaryCard({
           borderTop: `1px solid ${alpha(colors.surfaceContainerLowest, 0.6)}`,
           backgroundColor: colors.surfaceContainerLowest,
           px: { xs: 2, sm: 2.5 },
-          py: 1.75,
+          pb: 1.75,
         }}
       >
         <Stack
@@ -267,7 +274,7 @@ export function CheckoutSummaryCard({
             sx={{
               maxWidth: 160,
               color: colors.primaryContainer,
-              fontSize: { xs: '0.98rem', sm: '1.05rem' },
+              fontSize: { xs: '0.9rem', sm: '0.96rem' },
               lineHeight: 1.2,
             }}
           >
@@ -287,16 +294,19 @@ export function CheckoutSummaryCard({
                 color: balanceAfterDeduction === null ? colors.onSurfaceVariant : 'inherit',
                 fontSize:
                   balanceAfterDeduction === null
-                    ? { xs: '0.92rem', sm: '0.98rem' }
-                    : { xs: '1.45rem', sm: '1.6rem' },
+                    ? { xs: '0.88rem', sm: '0.94rem' }
+                    : { xs: '1.28rem', sm: '1.4rem' },
                 lineHeight: 1.1,
               }}
             >
-              {balanceAfterDeduction === null
-                ? 'Unavailable'
-                : formatBalance(balanceAfterDeduction, displayWalletCurrency)}
+              {walletBalanceIsLoading ? (
+                <AmountSkeleton />
+              ) : balanceAfterDeduction === null ? (
+                'Unavailable'
+              ) : (
+                formatBalance(balanceAfterDeduction, displayWalletCurrency)
+              )}
             </Typography>
-            {balanceAfterDeduction === null ? null : <EastRoundedIcon sx={{ fontSize: 22 }} />}
           </Stack>
         </Stack>
       </Box>
@@ -363,7 +373,7 @@ function SummaryRow({
         sx={{
           color: emphasized ? colors.onSurface : colors.onSurfaceVariant,
           fontFamily: emphasized ? '"Lexend", sans-serif' : '"Inter", sans-serif',
-          fontSize: emphasized ? { xs: '1rem', sm: '1.05rem' } : { xs: '0.88rem', sm: '0.92rem' },
+          fontSize: emphasized ? { xs: '0.92rem', sm: '0.98rem' } : { xs: '0.88rem', sm: '0.92rem' },
           fontWeight: emphasized ? 700 : 500,
           lineHeight: 1.25,
         }}
@@ -371,10 +381,11 @@ function SummaryRow({
         {label}
       </Typography>
       <Typography
+        component="div"
         sx={{
           color: valueMuted ? colors.onSurfaceVariant : (valueColor ?? colors.onSurface),
           fontFamily: emphasized ? '"Lexend", sans-serif' : '"Inter", sans-serif',
-          fontSize: emphasized ? { xs: '1.05rem', sm: '1.1rem' } : { xs: '0.9rem', sm: '0.95rem' },
+          fontSize: emphasized ? { xs: '0.98rem', sm: '1.04rem' } : { xs: '0.9rem', sm: '0.95rem' },
           fontWeight: emphasized ? 700 : 500,
           lineHeight: 1.2,
           textAlign: 'right',
@@ -384,6 +395,10 @@ function SummaryRow({
       </Typography>
     </Stack>
   )
+}
+
+function AmountSkeleton() {
+  return <Skeleton animation="wave" height={24} sx={{ borderRadius: 1 }} width={96} />
 }
 
 const sectionOverlineSx = {

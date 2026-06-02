@@ -1,7 +1,7 @@
 import ApartmentRoundedIcon from '@mui/icons-material/ApartmentRounded'
+import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded'
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded'
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
-import CurrencyRupeeRoundedIcon from '@mui/icons-material/CurrencyRupeeRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import LockResetRoundedIcon from '@mui/icons-material/LockResetRounded'
 import PersonAddAlt1OutlinedIcon from '@mui/icons-material/PersonAddAlt1Outlined'
@@ -44,7 +44,7 @@ export function ProfileScreen() {
       value: formatRoleLabel(user?.role),
     },
     {
-      icon: <CurrencyRupeeRoundedIcon />,
+      icon: <AttachMoneyRoundedIcon />,
       label: 'Base Currency',
       value: user?.baseCurrency?.trim() ?? '',
     },
